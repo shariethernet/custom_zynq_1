@@ -25,6 +25,7 @@ python harness.py
 - Upload the ```PYNQ_cpu.tar``` tar folder 
 - Open terminal in server and untar using 
 ```
+cd /home/xilinx/jupyter_notebooks
 tar -xvf PYNQ_cpu.tar
 ```
 - Now run the ```cpu.ipynb``` file.
