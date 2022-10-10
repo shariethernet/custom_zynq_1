@@ -31,6 +31,7 @@ def main():
     os.system("cp ./harness_axi_proj/harness_axi_proj.gen/sources_1/bd/design_1/hw_handoff/design_1_bd.tcl ./PYNQ_cpu/overlay/harness_axi.tcl")
     os.system("cp ./harness_axi_proj/harness_axi_proj.gen/sources_1/bd/design_1/hw_handoff/design_1.hwh ./PYNQ_cpu/overlay/harness_axi.hwh")
     os.system("rm -r NA")
+    os.system("tar -zcvf PYNQ_cpu.tar PYNQ_cpu/")
     print("Done!!")
 
 if __name__ == "__main__":
