@@ -1,6 +1,9 @@
 # Single cycle CPU - running on FPGA
 Implement all instructions for RISC-V including Branch instructions. This repository will provide the automation flow for running the design into hardware.
 
+## Changes to make in cpu.v file:
+One extra output port ```registers``` is added in the ```cpu.v``` file. This should store all 32 register values in the order reg31,reg30,...,reg1,reg0(you can use concatenation operator). Add logic for the same in the code.
+
 ## Steps to run:
 1. Clone this repository:
 ```
