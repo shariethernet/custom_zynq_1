@@ -19,6 +19,6 @@ python harness.py
 
 - ```harness_axi_proj``` - Vivado project file. 
 
-- ```PYNQ_files```       - PYNQ Overlay(bitstream related) files.
+- ```PYNQ_files/overlay/```       - PYNQ Overlay(bitstream related) files.
 
 5. Open the FPGA Remote Jupyter server. Upload the ```PYNQ_files``` folder and run cpu.ipynb.
