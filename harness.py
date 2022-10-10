@@ -25,13 +25,11 @@ def main():
         print("Error - Block design and bitstream Generation")
         exit()
 
-    os.system("mkdir -p PYNQ_files")
     os.system("mkdir -p PYNQ_files/overlay")
 
     os.system("cp ./harness_axi_proj/harness_axi_proj.runs/impl_1/design_1_wrapper.bit  ./PYNQ_files/overlay/harness_axi.bit")
     os.system("cp ./harness_axi_proj/harness_axi_proj.gen/sources_1/bd/design_1/hw_handoff/design_1_bd.tcl ./PYNQ_files/overlay/harness_axi.tcl")
     os.system("cp ./harness_axi_proj/harness_axi_proj.gen/sources_1/bd/design_1/hw_handoff/design_1.hwh ./PYNQ_files/overlay/harness_axi.hwh")
-    os.system("cp ./cpu.ipynb ./PYNQ_files/cpu.ipynb")
     os.system("rm -r NA")
     print("Done!!")
 
