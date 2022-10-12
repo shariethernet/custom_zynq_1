@@ -17,13 +17,17 @@ file copy -force $output_dir/data2.mem $output_dir/harness_axi_ip/harness_axi_ip
 file copy -force $output_dir/data3.mem $output_dir/harness_axi_ip/harness_axi_ip.srcs/sources_1/imports/data3.mem
 
 foreach line $data {
-    file copy -force $output_dir/$line $output_dir/harness_axi_ip/harness_axi_ip.srcs/sources_1/imports/$line
+    if{$line != ""}{
+        file copy -force $output_dir/$line $output_dir/harness_axi_ip/harness_axi_ip.srcs/sources_1/imports/$line
+    }
 }
 read_verilog $output_dir/harness_axi_ip/harness_axi_ip.srcs/sources_1/new/harness_axi_ip_v1_0.v
 read_verilog $output_dir/harness_axi_ip/harness_axi_ip.srcs/sources_1/new/harness_axi_ip_v1_0_S00_AXI.v
 read_verilog $output_dir/harness_axi_ip/harness_axi_ip.srcs/sources_1/new/harness_axi.v
 foreach line $data {
-    read_verilog $output_dir/harness_axi_ip/harness_axi_ip.srcs/sources_1/imports/$line
+    if{$line != ""}{
+        read_verilog $output_dir/harness_axi_ip/harness_axi_ip.srcs/sources_1/imports/$line
+    }
 }
 read_mem $output_dir/harness_axi_ip/harness_axi_ip.srcs/sources_1/imports/data0.mem
 read_mem $output_dir/harness_axi_ip/harness_axi_ip.srcs/sources_1/imports/data1.mem
