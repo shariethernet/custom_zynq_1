@@ -17,16 +17,18 @@ file copy -force $output_dir/data2.mem $output_dir/harness_axi_ip/harness_axi_ip
 file copy -force $output_dir/data3.mem $output_dir/harness_axi_ip/harness_axi_ip.srcs/sources_1/imports/data3.mem
 
 foreach line $data {
-    if {$line != ""} {
-        file copy -force $output_dir/$line $output_dir/harness_axi_ip/harness_axi_ip.srcs/sources_1/imports/$line
+    set line_stripped [string map {" " ""} $line]
+    if {$line_stripped != ""} {
+        file copy -force $output_dir/$line_stripped $output_dir/harness_axi_ip/harness_axi_ip.srcs/sources_1/imports/$line_stripped
     }
 }
 read_verilog $output_dir/harness_axi_ip/harness_axi_ip.srcs/sources_1/new/harness_axi_ip_v1_0.v
 read_verilog $output_dir/harness_axi_ip/harness_axi_ip.srcs/sources_1/new/harness_axi_ip_v1_0_S00_AXI.v
 read_verilog $output_dir/harness_axi_ip/harness_axi_ip.srcs/sources_1/new/harness_axi.v
 foreach line $data {
-    if {$line != ""} {
-        read_verilog $output_dir/harness_axi_ip/harness_axi_ip.srcs/sources_1/imports/$line
+    set line_stripped [string map {" " ""} $line]
+    if {$line_stripped != ""} {
+        read_verilog $output_dir/harness_axi_ip/harness_axi_ip.srcs/sources_1/imports/$line_stripped
     }
 }
 read_mem $output_dir/harness_axi_ip/harness_axi_ip.srcs/sources_1/imports/data0.mem
