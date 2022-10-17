@@ -191,8 +191,6 @@ proc create_root_design { parentCell } {
 
 
   # Create interface ports
-  set DDR [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:ddrx_rtl:1.0 DDR ]
-
   set FIXED_IO [ create_bd_intf_port -mode Master -vlnv xilinx.com:display_processing_system7:fixedio_rtl:1.0 FIXED_IO ]
 
 
@@ -278,7 +276,7 @@ proc create_root_design { parentCell } {
    CONFIG.PCW_DDR_PORT2_HPR_ENABLE {0} \
    CONFIG.PCW_DDR_PORT3_HPR_ENABLE {0} \
    CONFIG.PCW_DDR_RAM_BASEADDR {0x00100000} \
-   CONFIG.PCW_DDR_RAM_HIGHADDR {0x1FFFFFFF} \
+   CONFIG.PCW_DDR_RAM_HIGHADDR {0x3FFFFFFF} \
    CONFIG.PCW_DDR_WRITE_TO_CRITICAL_PRIORITY_LEVEL {2} \
    CONFIG.PCW_DM_WIDTH {4} \
    CONFIG.PCW_DQS_WIDTH {4} \
@@ -318,7 +316,7 @@ proc create_root_design { parentCell } {
    CONFIG.PCW_EN_CLKTRIG1_PORT {0} \
    CONFIG.PCW_EN_CLKTRIG2_PORT {0} \
    CONFIG.PCW_EN_CLKTRIG3_PORT {0} \
-   CONFIG.PCW_EN_DDR {1} \
+   CONFIG.PCW_EN_DDR {0} \
    CONFIG.PCW_EN_EMIO_CAN0 {0} \
    CONFIG.PCW_EN_EMIO_CAN1 {0} \
    CONFIG.PCW_EN_EMIO_CD_SDIO0 {0} \
@@ -881,12 +879,12 @@ proc create_root_design { parentCell } {
    CONFIG.PCW_UIPARAM_DDR_ADV_ENABLE {0} \
    CONFIG.PCW_UIPARAM_DDR_AL {0} \
    CONFIG.PCW_UIPARAM_DDR_BANK_ADDR_COUNT {3} \
-   CONFIG.PCW_UIPARAM_DDR_BL {8} \
+   CONFIG.PCW_UIPARAM_DDR_BL {<Select>} \
    CONFIG.PCW_UIPARAM_DDR_BOARD_DELAY0 {0.279} \
    CONFIG.PCW_UIPARAM_DDR_BOARD_DELAY1 {0.260} \
    CONFIG.PCW_UIPARAM_DDR_BOARD_DELAY2 {0.085} \
    CONFIG.PCW_UIPARAM_DDR_BOARD_DELAY3 {0.092} \
-   CONFIG.PCW_UIPARAM_DDR_BUS_WIDTH {16 Bit} \
+   CONFIG.PCW_UIPARAM_DDR_BUS_WIDTH {<Select>} \
    CONFIG.PCW_UIPARAM_DDR_CL {7} \
    CONFIG.PCW_UIPARAM_DDR_CLOCK_0_LENGTH_MM {27.95} \
    CONFIG.PCW_UIPARAM_DDR_CLOCK_0_PACKAGE_LENGTH {80.4535} \
@@ -903,7 +901,7 @@ proc create_root_design { parentCell } {
    CONFIG.PCW_UIPARAM_DDR_CLOCK_STOP_EN {0} \
    CONFIG.PCW_UIPARAM_DDR_COL_ADDR_COUNT {10} \
    CONFIG.PCW_UIPARAM_DDR_CWL {6} \
-   CONFIG.PCW_UIPARAM_DDR_DEVICE_CAPACITY {4096 MBits} \
+   CONFIG.PCW_UIPARAM_DDR_DEVICE_CAPACITY {<Select>} \
    CONFIG.PCW_UIPARAM_DDR_DQS_0_LENGTH_MM {32.14} \
    CONFIG.PCW_UIPARAM_DDR_DQS_0_PACKAGE_LENGTH {105.056} \
    CONFIG.PCW_UIPARAM_DDR_DQS_0_PROPOGATION_DELAY {160} \
@@ -932,18 +930,18 @@ proc create_root_design { parentCell } {
    CONFIG.PCW_UIPARAM_DDR_DQ_3_LENGTH_MM {0} \
    CONFIG.PCW_UIPARAM_DDR_DQ_3_PACKAGE_LENGTH {103.977} \
    CONFIG.PCW_UIPARAM_DDR_DQ_3_PROPOGATION_DELAY {160} \
-   CONFIG.PCW_UIPARAM_DDR_DRAM_WIDTH {16 Bits} \
-   CONFIG.PCW_UIPARAM_DDR_ECC {Disabled} \
-   CONFIG.PCW_UIPARAM_DDR_ENABLE {1} \
-   CONFIG.PCW_UIPARAM_DDR_FREQ_MHZ {525} \
-   CONFIG.PCW_UIPARAM_DDR_HIGH_TEMP {Normal (0-85)} \
-   CONFIG.PCW_UIPARAM_DDR_MEMORY_TYPE {DDR 3} \
-   CONFIG.PCW_UIPARAM_DDR_PARTNO {MT41J256M16 RE-125} \
+   CONFIG.PCW_UIPARAM_DDR_DRAM_WIDTH {<Select>} \
+   CONFIG.PCW_UIPARAM_DDR_ECC {<Select>} \
+   CONFIG.PCW_UIPARAM_DDR_ENABLE {0} \
+   CONFIG.PCW_UIPARAM_DDR_FREQ_MHZ {533.333} \
+   CONFIG.PCW_UIPARAM_DDR_HIGH_TEMP {<Select>} \
+   CONFIG.PCW_UIPARAM_DDR_MEMORY_TYPE {<Select>} \
+   CONFIG.PCW_UIPARAM_DDR_PARTNO {<Select>} \
    CONFIG.PCW_UIPARAM_DDR_ROW_ADDR_COUNT {15} \
-   CONFIG.PCW_UIPARAM_DDR_SPEED_BIN {DDR3_1066F} \
-   CONFIG.PCW_UIPARAM_DDR_TRAIN_DATA_EYE {1} \
-   CONFIG.PCW_UIPARAM_DDR_TRAIN_READ_GATE {1} \
-   CONFIG.PCW_UIPARAM_DDR_TRAIN_WRITE_LEVEL {1} \
+   CONFIG.PCW_UIPARAM_DDR_SPEED_BIN {<Select>} \
+   CONFIG.PCW_UIPARAM_DDR_TRAIN_DATA_EYE {0} \
+   CONFIG.PCW_UIPARAM_DDR_TRAIN_READ_GATE {0} \
+   CONFIG.PCW_UIPARAM_DDR_TRAIN_WRITE_LEVEL {0} \
    CONFIG.PCW_UIPARAM_DDR_T_FAW {40.0} \
    CONFIG.PCW_UIPARAM_DDR_T_RAS_MIN {35.0} \
    CONFIG.PCW_UIPARAM_DDR_T_RC {48.91} \
@@ -1014,7 +1012,6 @@ proc create_root_design { parentCell } {
   set rst_ps7_0_50M [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 rst_ps7_0_50M ]
 
   # Create interface connections
-  connect_bd_intf_net -intf_net processing_system7_0_DDR [get_bd_intf_ports DDR] [get_bd_intf_pins processing_system7_0/DDR]
   connect_bd_intf_net -intf_net processing_system7_0_FIXED_IO [get_bd_intf_ports FIXED_IO] [get_bd_intf_pins processing_system7_0/FIXED_IO]
   connect_bd_intf_net -intf_net processing_system7_0_M_AXI_GP0 [get_bd_intf_pins processing_system7_0/M_AXI_GP0] [get_bd_intf_pins ps7_0_axi_periph/S00_AXI]
   connect_bd_intf_net -intf_net ps7_0_axi_periph_M00_AXI [get_bd_intf_pins harness_axi_ip_v1_0_0/s00_axi] [get_bd_intf_pins ps7_0_axi_periph/M00_AXI]
@@ -1033,7 +1030,6 @@ proc create_root_design { parentCell } {
   # Restore current instance
   current_bd_instance $oldCurInst
 
-  validate_bd_design
   save_bd_design
 }
 # End of create_root_design()
@@ -1045,7 +1041,6 @@ proc create_root_design { parentCell } {
 
 create_root_design ""
 
-
 ########### Upgrade IP
 export_ip_user_files -of_objects [get_ips design_1_harness_axi_ip_v1_0_0_0] -no_script -sync -force -quiet
 
@@ -1055,9 +1050,10 @@ make_wrapper -files [get_files ./harness_axi_proj/harness_axi_proj.srcs/sources_
 
 add_files -norecurse ./harness_axi_proj/harness_axi_proj.srcs/sources_1/bd/design_1/hdl/design_1_wrapper.v
 
-####### Generate Bitstream
-
 launch_runs impl_1 -to_step write_bitstream -jobs 16
+
 puts "Generating bitstream. It will take some time!"
+
 wait_on_run impl_1
+
 puts "Implementation done!"
