@@ -54,7 +54,7 @@ Check the entire set of printed messages for any "ERROR" lines. If you see "ERRO
 - ```PYNQ_cpu.tar```       - PYNQ Overlay(bitstream related) files.
 
 5. Open the FPGA Remote Jupyter server. 
-- Upload the ```PYNQ_cpu.tar``` tar folder 
+- Upload the ```PYNQ_cpu.tar``` tar file 
 - Open terminal in server and untar using 
 ```
 cd /home/xilinx/jupyter_notebooks
