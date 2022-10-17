@@ -12,3 +12,5 @@ harness_axis_proj/
 harness_axi_proj/
 *.str
 a.out
+cached_results/
+
