@@ -14,7 +14,7 @@ module cpu (
     input [31:0] drdata,
     output [31:0] dwdata,
     output [3:0] dwe,
-    output [32*32-1:0] registers  # EXTRA PORT
+    output [32*32-1:0] registers  // EXTRA PORT
 
 );
 ```

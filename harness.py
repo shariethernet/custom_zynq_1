@@ -11,7 +11,8 @@ def main():
     
     print("\n**************Starting AXI Lite IP Packaging******************\n")
     output_dir = "./src/axi_lite"
-
+    os.system("mkdir -p cached_results")
+    os.system("mkdir -p cached_results/harness_axi_proj.cache")
     
     try:
         os.system("vivado -mode batch -source "+output_dir+"/ip_create.tcl -nolog -nojournal")
@@ -31,8 +32,6 @@ def main():
         os.system("cp ./harness_axi_proj/harness_axi_proj.gen/sources_1/bd/design_1/hw_handoff/design_1.hwh ./PYNQ_cpu/overlay/harness_axi.hwh")
         os.system("rm -r NA")
         os.system("tar -zcvf PYNQ_cpu.tar PYNQ_cpu/")
-        os.system("mkdir -p cached_results")
-        os.system("mkdir -p cached_results/harness_axi_proj.cache")
         os.system("cp -r ./harness_axi_proj/harness_axi_proj.cache/ ./cached_results/harness_axi_proj.cache")
         print("Done!!")
     else:
