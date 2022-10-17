@@ -24,15 +24,19 @@ def main():
     except:
         print("Error - Block design and bitstream Generation")
         exit()
-
-    os.system("mkdir -p PYNQ_cpu/overlay")
-
-    os.system("cp ./harness_axi_proj/harness_axi_proj.runs/impl_1/design_1_wrapper.bit  ./PYNQ_cpu/overlay/harness_axi.bit")
-    os.system("cp ./harness_axi_proj/harness_axi_proj.gen/sources_1/bd/design_1/hw_handoff/design_1_bd.tcl ./PYNQ_cpu/overlay/harness_axi.tcl")
-    os.system("cp ./harness_axi_proj/harness_axi_proj.gen/sources_1/bd/design_1/hw_handoff/design_1.hwh ./PYNQ_cpu/overlay/harness_axi.hwh")
-    os.system("rm -r NA")
-    os.system("tar -zcvf PYNQ_cpu.tar PYNQ_cpu/")
-    print("Done!!")
+    if(os.path.exists("./harness_axi_proj/harness_axi_proj.runs/impl_1/design_1_wrapper.bit")):
+        os.system("mkdir -p PYNQ_cpu/overlay")
+        os.system("cp ./harness_axi_proj/harness_axi_proj.runs/impl_1/design_1_wrapper.bit  ./PYNQ_cpu/overlay/harness_axi.bit")
+        os.system("cp ./harness_axi_proj/harness_axi_proj.gen/sources_1/bd/design_1/hw_handoff/design_1_bd.tcl ./PYNQ_cpu/overlay/harness_axi.tcl")
+        os.system("cp ./harness_axi_proj/harness_axi_proj.gen/sources_1/bd/design_1/hw_handoff/design_1.hwh ./PYNQ_cpu/overlay/harness_axi.hwh")
+        os.system("rm -r NA")
+        os.system("tar -zcvf PYNQ_cpu.tar PYNQ_cpu/")
+        os.system("mkdir -p cached_results")
+        os.system("mkdir -p cached_results/harness_axi_proj.cache")
+        os.system("cp -r ./harness_axi_proj/harness_axi_proj.cache/ ./cached_results/harness_axi_proj.cache")
+        print("Done!!")
+    else:
+        sys.exit("Error: Bitstream not generated. Look for errors above.")
 
 if __name__ == "__main__":
     main()

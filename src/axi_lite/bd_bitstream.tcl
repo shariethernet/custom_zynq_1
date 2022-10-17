@@ -45,7 +45,7 @@ set list_projs [get_projects -quiet]
 if { $list_projs eq "" } {
    create_project -f harness_axi_proj harness_axi_proj -part xc7z020clg400-1
 }
-
+exec cp -r ./cached_results/harness_axi_proj.cache ./harness_axi_proj/
 
 # CHANGE DESIGN NAME HERE
 variable design_name
@@ -1057,3 +1057,4 @@ puts "Generating bitstream. It will take some time!"
 wait_on_run impl_1
 
 puts "Implementation done!"
+
