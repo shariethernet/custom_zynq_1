@@ -61,3 +61,6 @@ cd /home/xilinx/jupyter_notebooks
 tar -xvf PYNQ_cpu.tar
 ```
 - Now run the ```cpu.ipynb``` file.
+
+```WARNING: [Vivado 12-8222] Failed run(s) : 'design_1_harness_axi_ip_v1_0_0_0_synth_1'```
+If you get this error from the script, there is some problem in the cpu design. Look into this ```/harness_axi_proj/harness_axi_proj.runs/design_1_harness_axi_ip_v1_0_0_0_synth_1/runme.log``` file to debug the issue.
