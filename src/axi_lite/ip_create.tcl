@@ -35,10 +35,7 @@ read_mem $output_dir/harness_axi_ip/harness_axi_ip.srcs/sources_1/imports/data2.
 read_mem $output_dir/harness_axi_ip/harness_axi_ip.srcs/sources_1/imports/data3.mem
 
 update_compile_order -fileset sources_1
-ipx::package_project -root_dir $output_dir/harness_axi_ip/harness_axi_ip.srcs/sources_1/new -vendor user.org -library user -taxonomy /UserIP
-ipx::open_ipxact_file $output_dir/harness_axi_ip/harness_axi_ip.srcs/sources_1/new/component.xml
-ipx::merge_project_changes hdl_parameters [ipx::current_core]
-ipx::merge_project_changes ports [ipx::current_core]
+ipx::package_project -import_files -root_dir $output_dir/harness_axi_ip/harness_axi_ip.srcs/sources_1/new -vendor user.org -library user -taxonomy /UserIP
 set_property core_revision 1 [ipx::current_core]
 ipx::create_xgui_files [ipx::current_core]
 ipx::update_checksums [ipx::current_core]
