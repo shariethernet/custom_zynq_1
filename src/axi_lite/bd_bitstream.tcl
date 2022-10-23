@@ -1026,6 +1026,12 @@ proc create_root_design { parentCell } {
   # Create address segments
   assign_bd_address -offset 0x43C00000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs harness_axi_ip_v1_0_0/s00_axi/reg0] -force
 
+  assign_bd_address -offset 0x43C00000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs harness_axi_ip_v1_0_0/s00_axi/reg0] -force
+
+  # Change clock frequency to 25MHz, uncomment below three if you design has timing violations
+  # startgroup
+  # set_property -dict [list CONFIG.PCW_FPGA1_PERIPHERAL_FREQMHZ {25}] [get_bd_cells processing_system7_0]
+  # endgroup
 
   # Restore current instance
   current_bd_instance $oldCurInst
