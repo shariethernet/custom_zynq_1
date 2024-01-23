@@ -981,19 +981,48 @@
 	        end                
 	    end
 	end    
+	// Wires for the harness signals - Make sure they dont exceed 32 bits
+	// If you exceed 32 bits use extra registers and concat in the driver code
 
 	// Implement memory mapped register select and read logic generation
 	// Slave register read enable is asserted when valid address is available
 	// and the slave is ready to accept the read address.
-	wire [C_S_AXI_DATA_WIDTH-1:0] reg0, reg1, reg2, reg3, reg4,
-	                              reg5, reg6, reg7, reg8, reg9,
-	                              reg10, reg11, reg12, reg13, reg14,
-	                              reg15, reg16, reg17, reg18, reg19,
-	                              reg20, reg21, reg22, reg23, reg24,
-	                              reg25, reg26, reg27, reg28, reg29,
-	                              reg30, reg31,
-								  iaddr;
-	
+	// wire [C_S_AXI_DATA_WIDTH-1:0] signal_name_1
+	//---Start here - Check the widths and split the registers - max width is 32 bits per register
+		
+	wire [C_S_AXI_DATA_WIDTH-1:0] stage_4_o;
+	wire [C_S_AXI_DATA_WIDTH-1:0] stage_1_in[(NUM_STACKS*STAGE_1_NUM_INPUTS*STAGE_1_BIT_WIDTH)/32];
+	wire [C_S_AXI_DATA_WIDTH-1:0] stage_1_flop_in[(NUM_STACKS*STAGE_1_NUM_INPUTS*STAGE_1_BIT_WIDTH)/32];
+
+	//-- End here
+	// logic [1:0] stage_4_o, //Chicken bit
+		// logic [NUM_STACKS-1:0][STAGE_1_NUM_INPUTS-1:0][STAGE_1_BIT_WIDTH-1:0] stage_1_in,
+		// logic [NUM_STACKS-1:0][STAGE_1_NUM_INPUTS-1:0][STAGE_1_BIT_WIDTH-1:0] stage_1_flop_in,
+		 logic [NUM_STACKS-1:0][SIZE_ACT_ARRAY-1:0][STAGE_1_BIT_WIDTH-1:0] wrData_act_q,
+		 logic [NUM_STACKS-1:0][STAGE_1_NUM_INPUTS-1:0][STAGE_1_BIT_WIDTH+STAGE_1_MAX_SHIFT_AMT-1:0] shift_out,
+		 logic [NUM_STACKS-1:0][STAGE_1_OUT_BIT_WIDTH-1:0] adder_out,
+		 logic [NUM_STACKS-1:0][STAGE_1_OUT_BIT_WIDTH-1:0] stage_1_out,
+		 logic [NUM_STACKS-1:0][STAGE_1_MUX_2_NUM_INPUTS-1:0][STAGE_1_OUT_BIT_WIDTH-1:0] mux_2_in,
+		 logic [NUM_STACKS-1:0][STAGE_1_MUX_2_NUM_INPUTS-1:0] sel,
+		 logic [NUM_STACKS-1:0][STAGE_1_OUT_BIT_WIDTH_NECESSARY-1:0] stage_2_in,
+		 logic [NUM_STACKS-1:0][$clog2(STAGE_1_NUM_INPUTS)-1:0] wrPtr_q,
+		 logic [NUM_STACKS-1:0][$clog2(STAGE_1_NUM_INPUTS)-1:0] wrPtr_d,
+		 logic [NUM_STACKS-1:0][STAGE_1_NUM_INPUTS-1:0][STAGE_1_OUT_BIT_WIDTH_NECESSARY-1:0] stage_2_out,
+		 logic [NUM_STACKS-1:0][STAGE_1_NUM_INPUTS-1:0][STAGE_1_OUT_BIT_WIDTH_NECESSARY-1:0] stage_3_in,
+		 logic [NUM_STACKS-1:0][STAGE_3_OUT_BIT_WIDTH-1:0] stage_3_out,
+		 logic [NUM_STACKS-1:0][STAGE_3_OUT_BIT_WIDTH-1:0] stage_3_out_acc,
+		 logic [NUM_STACKS-1:0][STAGE_3_OUT_BIT_WIDTH-1:0] stage_4_in,
+		 logic [NUM_STACKS-1:0][counter_bit_width-1:0] counter_q,
+		 logic [NUM_STACKS-1:0][counter_bit_width-1:0] counter_q1,
+		 logic [NUM_STACKS-1:0][counter_bit_width-1:0] counter_q2,
+		 logic [NUM_STACKS-1:0][counter_bit_width-1:0] counter_d,
+		 logic [NUM_STACKS-1:0][STAGE_4_OUT_BIT_WIDTH-1:0] stage_4_out_mul,
+		 logic [NUM_STACKS-1:0][STAGE_4_OUT_BIT_WIDTH-1:0] stage_4_out,
+		 logic [NUM_STACKS-1:0][STAGE_4_OUT_BIT_WIDTH-1:0][STAGE_4_OUT_BIT_WIDTH-1:0] mult_inter,
+		 logic [NUM_STACKS-1:0] weight_zero, 
+		 logic [STAGE_1_BIT_WIDTH+STAGE_1_NUM_INPUTS-1:0] mul_test
+	//-- Ends here
+	// Add the address mapping for the harness signals below
 	assign slv_reg_rden = axi_arready & S_AXI_ARVALID & ~axi_rvalid;
 //	wire [C_S_AXI_DATA_WIDTH-1:0] reg31, reg30, reg29, reg28, reg27, reg26, reg2, reg24, reg23, reg22, reg21, reg20, reg19, reg18, reg17, reg16, reg15, reg14, reg13, reg12, reg11, reg10, reg9, reg8, reg7, reg6, reg5, reg4, reg3, reg2, reg1, reg0;
 	always @(*)
@@ -1032,40 +1061,40 @@
 	        7'h1D   : reg_data_out <= slv_reg29;
 	        7'h1E   : reg_data_out <= slv_reg30;
 	        7'h1F   : reg_data_out <= slv_reg31;
-	        7'h20   : reg_data_out <= reg0;
-	        7'h21   : reg_data_out <= reg1;
-	        7'h22   : reg_data_out <= reg2;
-	        7'h23   : reg_data_out <= reg3;
-	        7'h24   : reg_data_out <= reg4;
-	        7'h25   : reg_data_out <= reg5;
-	        7'h26   : reg_data_out <= reg6;
-	        7'h27   : reg_data_out <= reg7;
-	        7'h28   : reg_data_out <= reg8;
-	        7'h29   : reg_data_out <= reg9;
-	        7'h2A   : reg_data_out <= reg10;
-	        7'h2B   : reg_data_out <= reg11;
-	        7'h2C   : reg_data_out <= reg12;
-	        7'h2D   : reg_data_out <= reg13;
-	        7'h2E   : reg_data_out <= reg14;
-	        7'h2F   : reg_data_out <= reg15;
-	        7'h30   : reg_data_out <= reg16;
-	        7'h31   : reg_data_out <= reg17;
-	        7'h32   : reg_data_out <= reg18;
-	        7'h33   : reg_data_out <= reg19;
-	        7'h34   : reg_data_out <= reg20;
-	        7'h35   : reg_data_out <= reg21;
-	        7'h36   : reg_data_out <= reg22;
-	        7'h37   : reg_data_out <= reg23;
-	        7'h38   : reg_data_out <= reg24;
-	        7'h39   : reg_data_out <= reg25;
-	        7'h3A   : reg_data_out <= reg26;
-	        7'h3B   : reg_data_out <= reg27;
-	        7'h3C   : reg_data_out <= reg28;
-	        7'h3D   : reg_data_out <= reg29;
-	        7'h3E   : reg_data_out <= reg30;
-	        7'h3F   : reg_data_out <= reg31;
+	        7'h20   : reg_data_out <= slv_reg32;
+	        7'h21   : reg_data_out <= slv_reg33;
+	        7'h22   : reg_data_out <= slv_reg34;
+	        7'h23   : reg_data_out <= slv_reg35;
+	        7'h24   : reg_data_out <= slv_reg36;
+	        7'h25   : reg_data_out <= slv_reg37;
+	        7'h26   : reg_data_out <= slv_reg38;
+	        7'h27   : reg_data_out <= slv_reg39;
+	        7'h28   : reg_data_out <= slv_reg40;
+	        7'h29   : reg_data_out <= slv_reg41;
+	        7'h2A   : reg_data_out <= slv_reg42;
+	        7'h2B   : reg_data_out <= slv_reg43;
+	        7'h2C   : reg_data_out <= slv_reg44;
+	        7'h2D   : reg_data_out <= slv_reg45;
+	        7'h2E   : reg_data_out <= slv_reg46;
+	        7'h2F   : reg_data_out <= slv_reg47;
+	        7'h30   : reg_data_out <= slv_reg48;
+	        7'h31   : reg_data_out <= slv_reg49;
+	        7'h32   : reg_data_out <= slv_reg50;
+	        7'h33   : reg_data_out <= slv_reg51;
+	        7'h34   : reg_data_out <= slv_reg52;
+	        7'h35   : reg_data_out <= slv_reg53;
+	        7'h36   : reg_data_out <= slv_reg54;
+	        7'h37   : reg_data_out <= slv_reg55;
+	        7'h38   : reg_data_out <= slv_reg56;
+	        7'h39   : reg_data_out <= slv_reg57;
+	        7'h3A   : reg_data_out <= slv_reg58;
+	        7'h3B   : reg_data_out <= slv_reg59;
+	        7'h3C   : reg_data_out <= slv_reg60;
+	        7'h3D   : reg_data_out <= slv_reg61;
+	        7'h3E   : reg_data_out <= slv_reg62;
+	        7'h3F   : reg_data_out <= slv_reg63;
 			7'h40   : reg_data_out <= slv_reg64;
-	        7'h41   : reg_data_out <= iaddr;
+	        7'h41   : reg_data_out <= slv_reg65;
 	        default : reg_data_out <= 0;
 	      endcase
 	end
@@ -1092,72 +1121,54 @@
 	// Add user logic here
 	harness_axi harness_axi_inst(
 		.clk(S_AXI_ACLK),
-		.idata0(slv_reg0),
-		.idata1(slv_reg1),
-		.idata2(slv_reg2),
-		.idata3(slv_reg3),
-		.idata4(slv_reg4),
-		.idata5(slv_reg5),
-		.idata6(slv_reg6),
-		.idata7(slv_reg7),
-		.idata8(slv_reg8),
-		.idata9(slv_reg9),
-		.idata10(slv_reg10),
-		.idata11(slv_reg11),
-		.idata12(slv_reg12),
-		.idata13(slv_reg13),
-		.idata14(slv_reg14),
-		.idata15(slv_reg15),
-		.idata16(slv_reg16),
-		.idata17(slv_reg17),
-		.idata18(slv_reg18),
-		.idata19(slv_reg19),
-		.idata20(slv_reg20),
-		.idata21(slv_reg21),
-		.idata22(slv_reg22),
-		.idata23(slv_reg23),
-		.idata24(slv_reg24),
-		.idata25(slv_reg25),
-		.idata26(slv_reg26),
-		.idata27(slv_reg27),
-		.idata28(slv_reg28),
-		.idata29(slv_reg29),
-		.idata30(slv_reg30),
-		.idata31(slv_reg31),
-		.reg0(reg0),
-		.reg1(reg1),
-		.reg2(reg2),
-		.reg3(reg3),
-		.reg4(reg4),
-		.reg5(reg5),
-		.reg6(reg6),
-		.reg7(reg7),
-		.reg8(reg8),
-		.reg9(reg9),
-		.reg10(reg10),
-		.reg11(reg11),
-		.reg12(reg12),
-		.reg13(reg13),
-		.reg14(reg14),
-		.reg15(reg15),
-		.reg16(reg16),
-		.reg17(reg17),
-		.reg18(reg18),
-		.reg19(reg19),
-		.reg20(reg20),
-		.reg21(reg21),
-		.reg22(reg22),
-		.reg23(reg23),
-		.reg24(reg24),
-		.reg25(reg25),
-		.reg26(reg26),
-		.reg27(reg27),
-		.reg28(reg28),
-		.reg29(reg29),
-		.reg30(reg30),
-		.reg31(reg31),
-		.reset(slv_reg64),
-		.iaddr(iaddr)
+		//-- Input
+		.wrEn_queue(wrEn_queue),
+		.wrData_queue(wrData_queue),
+		.DISABLE_STAGE_1(DISABLE_STAGE_1),
+		.DISABLE_STAGE_4(DISABLE_STAGE_4),
+		.wrEn_act_array(wrEn_act_array),
+		.wrData_act(wrData_act),
+		.input_wt(input_wt),
+		.SRAM_flop_en_in(SRAM_flop_en_in),//Chicken bit
+		.flop_1_en_in(flop_1_en_in),//Chicken bit
+		.flop_3_en_in(flop_3_en_in),//Chicken bit
+		.queue_en_in(queue_en_in),//Chicken bit for stage 2
+		.wrPtr_d_in(wrPtr_d_in), //Chicken bit
+		.in(in),//Chicken bit for safety reasons
+		.wrPtr_over_in(wrPtr_over_in), //Chicken bit
+		.DISABLE_STAGE_2(DISABLE_STAGE_2),//Chicken bit
+		.DISABLE_STAGE_3(DISABLE_STAGE_3),//Chicken bit
+		.chicken_bit(chicken_bit),
+
+		//-- Output
+		.stage_4_o(stage_4_o), //Chicken bit
+		.stage_1_in(stage_1_in),
+		.stage_1_flop_in(stage_1_flop_in),
+		.wrData_act_q(wrData_act_q),
+		.shift_out(shift_out),
+		.adder_out(adder_out),
+		.stage_1_out(stage_1_out),
+		.mux_2_in(mux_2_in),
+		.sel(sel),
+		.stage_2_in(stage_2_in),
+		.wrPtr_q(wrPtr_q),
+		.wrPtr_d(wrPtr_d),
+		.stage_2_out(stage_2_out),
+		.stage_3_in(stage_3_in),
+		.stage_3_out(stage_3_out),
+		.stage_3_out_acc(stage_3_out_acc),
+		.stage_4_in(stage_4_in),
+		.counter_q(counter_q),
+		.counter_q1(counter_q1),
+		.counter_q2(counter_q2),
+		.counter_d(counter_d),
+		.stage_4_out_mul(stage_4_out_mul),
+		.stage_4_out(stage_4_out),
+		.mult_inter(mult_inter),
+		.weight_zero(weight_zero), 
+		.mul_test(mul_test),
+		//-- End edits
+		.reset(slv_reg64)
 	);
 
 	// User logic ends

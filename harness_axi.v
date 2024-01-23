@@ -1,138 +1,125 @@
 `timescale 1ns / 1ps
-module harness_axi(
-        input clk,
-		input reset,
-		output [31:0] iaddr,
-		input [31:0] idata0,
-		input [31:0] idata1,
-		input [31:0] idata2,
-		input [31:0] idata3,
-		input [31:0] idata4,
-		input [31:0] idata5,
-		input [31:0] idata6,
-		input [31:0] idata7,
-		input [31:0] idata8,
-		input [31:0] idata9,
-		input [31:0] idata10,
-		input [31:0] idata11,
-		input [31:0] idata12,
-		input [31:0] idata13,
-		input [31:0] idata14,
-		input [31:0] idata15,
-		input [31:0] idata16,
-		input [31:0] idata17,
-		input [31:0] idata18,
-		input [31:0] idata19,
-		input [31:0] idata20,
-		input [31:0] idata21,
-		input [31:0] idata22,
-		input [31:0] idata23,
-		input [31:0] idata24,
-		input [31:0] idata25,
-		input [31:0] idata26,
-		input [31:0] idata27,
-		input [31:0] idata28,
-		input [31:0] idata29,
-		input [31:0] idata30,
-		input [31:0] idata31,
-		output [31:0] reg0,
-		output [31:0] reg1,
-		output [31:0] reg2,
-		output [31:0] reg3,
-		output [31:0] reg4,
-		output [31:0] reg5,
-		output [31:0] reg6,
-		output [31:0] reg7,
-		output [31:0] reg8,
-		output [31:0] reg9,
-		output [31:0] reg10,
-		output [31:0] reg11,
-		output [31:0] reg12,
-		output [31:0] reg13,
-		output [31:0] reg14,
-		output [31:0] reg15,
-		output [31:0] reg16,
-		output [31:0] reg17,
-		output [31:0] reg18,
-		output [31:0] reg19,
-		output [31:0] reg20,
-		output [31:0] reg21,
-		output [31:0] reg22,
-		output [31:0] reg23,
-		output [31:0] reg24,
-		output [31:0] reg25,
-		output [31:0] reg26,
-		output [31:0] reg27,
-		output [31:0] reg28,
-		output [31:0] reg29,
-		output [31:0] reg30,
-		output [31:0] reg31
-    );
-    reg [31:0] idata;
-    wire [31:0] daddr, drdata, dwdata;
-    wire [31:0] iaddr;
-    wire [3:0] dwe;
-    always@(*) begin
-		if(reset)
-			idata <= 0;
-		else begin
-        case(iaddr[6:2])
-            5'd0 : idata <= idata0;
-            5'd1 : idata <= idata1;
-            5'd2 : idata <= idata2;
-            5'd3 : idata <= idata3;
-            5'd4 : idata <= idata4;
-            5'd5 : idata <= idata5;
-            5'd6 : idata <= idata6;
-            5'd7 : idata <= idata7;
-            5'd8 : idata <= idata8;
-            5'd9 : idata <= idata9;
-            5'd10 : idata <= idata10;
-            5'd11 : idata <= idata11;
-            5'd12 : idata <= idata12;
-            5'd13 : idata <= idata13;
-            5'd14 : idata <= idata14;
-            5'd15 : idata <= idata15;
-            5'd16 : idata <= idata16;
-            5'd17 : idata <= idata17;
-            5'd18 : idata <= idata18;
-            5'd19 : idata <= idata19;
-            5'd20 : idata <= idata20;
-            5'd21 : idata <= idata21;
-            5'd22 : idata <= idata22;
-            5'd23 : idata <= idata23;
-            5'd24 : idata <= idata24;
-            5'd25 : idata <= idata25;
-            5'd26 : idata <= idata26;
-            5'd27 : idata <= idata27;
-            5'd28 : idata <= idata28;
-            5'd29 : idata <= idata29;
-            5'd30 : idata <= idata30;
-            5'd31 : idata <= idata31;
-            default: idata <= 0;
-        endcase
-		end
-   end
-   
-   wire [32*32-1:0] registers;
-   assign {reg31, reg30, reg29, reg28, reg27, reg26, reg25, reg24, reg23, reg22, reg21, reg20, reg19, reg18, reg17, reg16, reg15, reg14, reg13, reg12, reg11, reg10, reg9, reg8, reg7, reg6, reg5, reg4, reg3, reg2, reg1, reg0} 
-           = registers;
-   cpu u1(
-        .clk(clk),
-        .reset(reset),
-        .iaddr(iaddr),
-        .idata(idata),
-        .daddr(daddr),
-        .drdata(drdata),
-        .dwdata(dwdata),
-        .dwe(dwe),
-        .registers(registers)
-    );
-    dmem u3(
-        .clk(clk),
-        .daddr(daddr),
-        .drdata(drdata),
-        .dwdata(dwdata),
-        .dwe(dwe)
-    );
+module harness_axi#(parameter NUM_STACKS = 8, 
+    parameter STAGE_1_NUM_INPUTS = 8,//should be power of 2
+    parameter STAGE_1_BIT_WIDTH = 8,
+    parameter SRAM_THROUGHPUT = 1, //cycles/bit - should be power of 2
+    parameter STAGE_4_BIT_WIDTH = 4,
+    parameter SIZE_ACT_ARRAY = 1,
+    parameter STAGE_1_MAX_SHIFT_AMT = STAGE_1_NUM_INPUTS-1,
+    parameter STAGE_1_MUX_2_NUM_INPUTS = STAGE_1_NUM_INPUTS+1,
+    parameter STAGE_1_OUT_BIT_WIDTH = STAGE_1_BIT_WIDTH+STAGE_1_MAX_SHIFT_AMT+$clog2(STAGE_1_NUM_INPUTS),
+    parameter STAGE_1_OUT_BIT_WIDTH_NECESSARY = STAGE_1_BIT_WIDTH, //For signed representation
+    parameter STAGE_3_OUT_BIT_WIDTH = STAGE_1_OUT_BIT_WIDTH_NECESSARY+ $clog2(STAGE_1_NUM_INPUTS),
+   parameter counter_bit_width = $clog2(SRAM_THROUGHPUT)+$clog2(STAGE_1_NUM_INPUTS),
+   parameter STAGE_4_OUT_BIT_WIDTH = STAGE_3_OUT_BIT_WIDTH+STAGE_4_BIT_WIDTH
+)(
+    input logic clk,
+    input logic reset,
+    input logic wrEn_queue,
+    input logic [STAGE_4_BIT_WIDTH-1:0] wrData_queue,
+    input logic DISABLE_STAGE_1,
+    input logic DISABLE_STAGE_4,
+    input logic wrEn_act_array,
+    input logic [NUM_STACKS-1:0][SIZE_ACT_ARRAY-1:0][STAGE_1_BIT_WIDTH-1:0] wrData_act,
+    input logic [NUM_STACKS-1:0][STAGE_1_BIT_WIDTH-1:0] input_wt,
+    input logic SRAM_flop_en_in,//Chicken bit
+    input logic flop_1_en_in,//Chicken bit
+    input logic flop_3_en_in,//Chicken bit
+    input logic queue_en_in,//Chicken bit for stage 2
+    input logic [$clog2(STAGE_1_BIT_WIDTH)-1:0] wrPtr_d_in, //Chicken bit
+    input logic in,//Chicken bit for safety reasons
+    input logic wrPtr_over_in, //Chicken bit
+    input logic DISABLE_STAGE_2,//Chicken bit
+    input logic DISABLE_STAGE_3,//Chicken bit
+    input logic chicken_bit,
+    output logic [1:0] stage_4_o, //Chicken bit
+    output logic [NUM_STACKS-1:0][STAGE_1_NUM_INPUTS-1:0][STAGE_1_BIT_WIDTH-1:0] stage_1_in,
+    output logic [NUM_STACKS-1:0][STAGE_1_NUM_INPUTS-1:0][STAGE_1_BIT_WIDTH-1:0] stage_1_flop_in,
+    output logic [NUM_STACKS-1:0][SIZE_ACT_ARRAY-1:0][STAGE_1_BIT_WIDTH-1:0] wrData_act_q,
+    output logic [NUM_STACKS-1:0][STAGE_1_NUM_INPUTS-1:0][STAGE_1_BIT_WIDTH+STAGE_1_MAX_SHIFT_AMT-1:0] shift_out,
+    output logic [NUM_STACKS-1:0][STAGE_1_OUT_BIT_WIDTH-1:0] adder_out,
+    //output logic [STAGE_1_NUM_INPUTS-1:0][STAGE_1_OUT_BIT_WIDTH-1:0] extended_in,//Not included in chip because mux_2_in is a superset
+    output logic [NUM_STACKS-1:0][STAGE_1_OUT_BIT_WIDTH-1:0] stage_1_out,
+ 
+    output logic [NUM_STACKS-1:0][STAGE_1_MUX_2_NUM_INPUTS-1:0][STAGE_1_OUT_BIT_WIDTH-1:0] mux_2_in,
+    output logic [NUM_STACKS-1:0][STAGE_1_MUX_2_NUM_INPUTS-1:0] sel,
+    output logic [NUM_STACKS-1:0][STAGE_1_OUT_BIT_WIDTH_NECESSARY-1:0] stage_2_in,
+    output logic [NUM_STACKS-1:0][$clog2(STAGE_1_NUM_INPUTS)-1:0] wrPtr_q,
+    output logic [NUM_STACKS-1:0][$clog2(STAGE_1_NUM_INPUTS)-1:0] wrPtr_d,
+    output logic [NUM_STACKS-1:0][STAGE_1_NUM_INPUTS-1:0][STAGE_1_OUT_BIT_WIDTH_NECESSARY-1:0] stage_2_out,
+    output logic [NUM_STACKS-1:0][STAGE_1_NUM_INPUTS-1:0][STAGE_1_OUT_BIT_WIDTH_NECESSARY-1:0] stage_3_in,
+    output logic [NUM_STACKS-1:0][STAGE_3_OUT_BIT_WIDTH-1:0] stage_3_out,
+    output logic [NUM_STACKS-1:0][STAGE_3_OUT_BIT_WIDTH-1:0] stage_3_out_acc,
+    output logic [NUM_STACKS-1:0][STAGE_3_OUT_BIT_WIDTH-1:0] stage_4_in,
+    output logic [NUM_STACKS-1:0][counter_bit_width-1:0] counter_q,
+    output logic [NUM_STACKS-1:0][counter_bit_width-1:0] counter_q1,
+    output logic [NUM_STACKS-1:0][counter_bit_width-1:0] counter_q2,
+    output logic [NUM_STACKS-1:0][counter_bit_width-1:0] counter_d,
+    //output logic [$clog2(STAGE_1_NUM_INPUTS):0][2**$clog2(STAGE_1_NUM_INPUTS)-1:0][STAGE_3_OUT_BIT_WIDTH-1:0] stage_3_inter, //Not used in chip
+    //output logic [STAGE_4_BIT_WIDTH-1:0] rdData_queue, // Not used in chip
+    output logic [NUM_STACKS-1:0][STAGE_4_OUT_BIT_WIDTH-1:0] stage_4_out_mul,
+    output logic [NUM_STACKS-1:0][STAGE_4_OUT_BIT_WIDTH-1:0] stage_4_out,
+    output logic [NUM_STACKS-1:0][STAGE_4_OUT_BIT_WIDTH-1:0][STAGE_4_OUT_BIT_WIDTH-1:0] mult_inter,
+    output logic [NUM_STACKS-1:0] weight_zero, 
+    output logic [STAGE_1_BIT_WIDTH+STAGE_1_NUM_INPUTS-1:0] mul_test );
+ 
+CIM_CHIP_no_pad_no_scan_parametrized #(.NUM_STACKS(NUM_STACKS),
+                      .STAGE_1_NUM_INPUTS(STAGE_1_NUM_INPUTS),//should be power of 2
+                      .STAGE_1_BIT_WIDTH(STAGE_1_BIT_WIDTH),
+                      .SRAM_THROUGHPUT(SRAM_THROUGHPUT), //cycles/bit - should be power of 2
+                      .STAGE_4_BIT_WIDTH(STAGE_4_BIT_WIDTH),
+                      .SIZE_ACT_ARRAY(SIZE_ACT_ARRAY),
+                      .STAGE_1_MAX_SHIFT_AMT(STAGE_1_NUM_INPUTS-1),
+                      .STAGE_1_MUX_2_NUM_INPUTS(STAGE_1_NUM_INPUTS+1),
+                      .STAGE_1_OUT_BIT_WIDTH(STAGE_1_BIT_WIDTH+STAGE_1_MAX_SHIFT_AMT+$clog2(STAGE_1_NUM_INPUTS)),
+                      .STAGE_1_OUT_BIT_WIDTH_NECESSARY(STAGE_1_OUT_BIT_WIDTH_NECESSARY), //For signed representation
+                      .STAGE_3_OUT_BIT_WIDTH(STAGE_1_OUT_BIT_WIDTH_NECESSARY+ $clog2(STAGE_1_NUM_INPUTS)),
+                     .counter_bit_width($clog2(SRAM_THROUGHPUT)+$clog2(STAGE_1_NUM_INPUTS)),
+                     .STAGE_4_OUT_BIT_WIDTH(STAGE_3_OUT_BIT_WIDTH+STAGE_4_BIT_WIDTH)
+                      ) CIM_dut (
+                        .clk(clk),
+                        .reset(reset), 
+                        .wrEn_queue(wrEn_queue), 
+                        .wrData_queue (wrData_queue), 
+                        .DISABLE_STAGE_1 (DISABLE_STAGE_1), 
+                        .DISABLE_STAGE_4 (DISABLE_STAGE_4), 
+                        .wrEn_act_array (wrEn_act_array), 
+                        .wrData_act (wrData_act),
+                        .input_wt (input_wt), 
+                        .SRAM_flop_en_in (SRAM_flop_en_in), 
+                        .flop_1_en_in (flop_1_en_in), 
+                        .flop_3_en_in (flop_3_en_in), 
+                        .queue_en_in (queue_en_in) , 
+                        .wrPtr_d_in(wrPtr_d_in), 
+                        .in(in), 
+                        .wrPtr_over_in(wrPtr_over_in), 
+                        .DISABLE_STAGE_2(DISABLE_STAGE_2), 
+                        .DISABLE_STAGE_3(DISABLE_STAGE_3), 
+                        .stage_4_o(stage_4_o),
+                        .stage_1_in (stage_1_in), 
+                        .stage_1_flop_in(stage_1_flop_in), 
+                        .wrData_act_q(wrData_act_q), 
+                        .shift_out(shift_out),
+                        .adder_out(adder_out),
+                        .stage_1_out(stage_1_out),
+                        .mux_2_in(mux_2_in), 
+                        .sel(sel), 
+                        .stage_2_in(stage_2_in),
+                        .wrPtr_q(wrPtr_q),
+                        .wrPtr_d(wrPtr_d), 
+                        .stage_2_out(stage_2_out),
+                        .stage_3_in(stage_3_in),
+                        .stage_3_out(stage_3_out),
+                        .stage_3_out_acc(stage_3_out_acc),
+                        .stage_4_in(stage_4_in),
+                        .counter_q(counter_q),
+                        .counter_q1(counter_q1),
+                        .counter_q2(counter_q2),
+                        .counter_d(counter_d),
+                        .stage_4_out_mul(stage_4_out_mul),
+                        .stage_4_out(stage_4_out),
+                        .mult_inter(mult_inter), 
+                        .chicken_bit(chicken_bit), 
+                        .weight_zero(weight_zero), 
+                        .mul_test(mul_test));
 endmodule
