@@ -988,20 +988,26 @@
 	// Slave register read enable is asserted when valid address is available
 	// and the slave is ready to accept the read address.
 	// wire [C_S_AXI_DATA_WIDTH-1:0] signal_name_1
+	//-- Master can only read from these registers as we are not adding the write logic to this
 	//---Start here - Check the widths and split the registers - max width is 32 bits per register
 		
 	wire [C_S_AXI_DATA_WIDTH-1:0] stage_4_o;
-	wire [C_S_AXI_DATA_WIDTH-1:0] stage_1_in[(NUM_STACKS*STAGE_1_NUM_INPUTS*STAGE_1_BIT_WIDTH)/32];
-	wire [C_S_AXI_DATA_WIDTH-1:0] stage_1_flop_in[(NUM_STACKS*STAGE_1_NUM_INPUTS*STAGE_1_BIT_WIDTH)/32];
+	wire [C_S_AXI_DATA_WIDTH-1:0] stage_1_in[((NUM_STACKS*STAGE_1_NUM_INPUTS*STAGE_1_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH)];
+	wire [C_S_AXI_DATA_WIDTH-1:0] stage_1_flop_in[((NUM_STACKS*STAGE_1_NUM_INPUTS*STAGE_1_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH)];
+	wire [C_S_AXI_DATA_WIDTH-1:0] wrData_act_q[((NUM_STACKS*SIZE_ACT_ARRAY*STAGE_1_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH)];
+	wire [C_S_AXI_DATA_WIDTH-1:0] shift_out[(NUM_STACKS*STAGE_1_NUM_INPUTS*(STAGE_1_BIT_WIDTH+STAGE_1_MAX_SHIFT_AMT)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH)];
+	wire [C_S_AXI_DATA_WIDTH-1:0] adder_out[((NUM_STACKS*STAGE_1_OUT_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH)];
+	wire [C_S_AXI_DATA_WIDTH-1:0] stage_1_out[((NUM_STACKS*STAGE_1_OUT_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH)];
 
 	//-- End here
-	// logic [1:0] stage_4_o, //Chicken bit
+	// References below comment after adding
+		// logic [1:0] stage_4_o, //Chicken bit
 		// logic [NUM_STACKS-1:0][STAGE_1_NUM_INPUTS-1:0][STAGE_1_BIT_WIDTH-1:0] stage_1_in,
 		// logic [NUM_STACKS-1:0][STAGE_1_NUM_INPUTS-1:0][STAGE_1_BIT_WIDTH-1:0] stage_1_flop_in,
-		 logic [NUM_STACKS-1:0][SIZE_ACT_ARRAY-1:0][STAGE_1_BIT_WIDTH-1:0] wrData_act_q,
-		 logic [NUM_STACKS-1:0][STAGE_1_NUM_INPUTS-1:0][STAGE_1_BIT_WIDTH+STAGE_1_MAX_SHIFT_AMT-1:0] shift_out,
-		 logic [NUM_STACKS-1:0][STAGE_1_OUT_BIT_WIDTH-1:0] adder_out,
-		 logic [NUM_STACKS-1:0][STAGE_1_OUT_BIT_WIDTH-1:0] stage_1_out,
+		// logic [NUM_STACKS-1:0][SIZE_ACT_ARRAY-1:0][STAGE_1_BIT_WIDTH-1:0] wrData_act_q,
+		// logic [NUM_STACKS-1:0][STAGE_1_NUM_INPUTS-1:0][STAGE_1_BIT_WIDTH+STAGE_1_MAX_SHIFT_AMT-1:0] shift_out,
+		// logic [NUM_STACKS-1:0][STAGE_1_OUT_BIT_WIDTH-1:0] adder_out,
+		// logic [NUM_STACKS-1:0][STAGE_1_OUT_BIT_WIDTH-1:0] stage_1_out,
 		 logic [NUM_STACKS-1:0][STAGE_1_MUX_2_NUM_INPUTS-1:0][STAGE_1_OUT_BIT_WIDTH-1:0] mux_2_in,
 		 logic [NUM_STACKS-1:0][STAGE_1_MUX_2_NUM_INPUTS-1:0] sel,
 		 logic [NUM_STACKS-1:0][STAGE_1_OUT_BIT_WIDTH_NECESSARY-1:0] stage_2_in,
