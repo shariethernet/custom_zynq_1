@@ -1003,6 +1003,21 @@
 	wire [C_S_AXI_DATA_WIDTH-1:0] stage_2_in[((NUM_STACKS*STAGE_1_OUT_BIT_WIDTH_NECESSARY)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH)];
 	wire [C_S_AXI_DATA_WIDTH-1:0] wrPtr_q[((NUM_STACKS*$clog2(STAGE_1_NUM_INPUTS))+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH)];
 	wire [C_S_AXI_DATA_WIDTH-1:0] wrPtr_d[((NUM_STACKS*$clog2(STAGE_1_NUM_INPUTS))+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH)];
+	wire [C_S_AXI_DATA_WIDTH-1:0] stage_2_out[((NUM_STACKS*STAGE_1_NUM_INPUTS*STAGE_1_OUT_BIT_WIDTH_NECESSARY)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH)];
+	wire [C_S_AXI_DATA_WIDTH-1:0] stage_3_in[((NUM_STACKS*STAGE_1_NUM_INPUTS*STAGE_1_OUT_BIT_WIDTH_NECESSARY)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH)];
+	wire [C_S_AXI_DATA_WIDTH-1:0] stage_3_out [((NUM_STACKS*STAGE_3_OUT_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH)];
+	wire [C_S_AXI_DATA_WIDTH-1:0] stage_3_out_acc [((NUM_STACKS*STAGE_3_OUT_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH)]; 
+	wire [C_S_AXI_DATA_WIDTH-1:0] stage_4_in [((NUM_STACKS*STAGE_3_OUT_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH)]; 
+	wire [C_S_AXI_DATA_WIDTH-1:0] counter_q [((NUM_STACKS*counter_bit_width)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH)];
+	wire [C_S_AXI_DATA_WIDTH-1:0] counter_q1 [((NUM_STACKS*counter_bit_width)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH)];
+	wire [C_S_AXI_DATA_WIDTH-1:0] counter_q2 [((NUM_STACKS*counter_bit_width)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH)];
+	wire [C_S_AXI_DATA_WIDTH-1:0] counter_d [((NUM_STACKS*counter_bit_width)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH)];
+	wire [C_S_AXI_DATA_WIDTH-1:0] stage_4_out_mul [((NUM_STACKS*STAGE_4_OUT_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH)];
+	wire [C_S_AXI_DATA_WIDTH-1:0] stage_4_out [((NUM_STACKS*STAGE_4_OUT_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH)];
+	wire [C_S_AXI_DATA_WIDTH-1:0] mult_inter [((NUM_STACKS*STAGE_4_OUT_BIT_WIDTH*STAGE_4_OUT_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH)];
+	wire [C_S_AXI_DATA_WIDTH-1:0] weight_zero [((NUM_STACKS)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH)];
+	wire [C_S_AXI_DATA_WIDTH-1:0] mul_test [((STAGE_1_BIT_WIDTH*STAGE_1_NUM_INPUTS)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH)];
+
 	//-- End here
 	// References below comment after adding
 		// logic [1:0] stage_4_o, //Chicken bit
@@ -1014,23 +1029,23 @@
 		// logic [NUM_STACKS-1:0][STAGE_1_OUT_BIT_WIDTH-1:0] stage_1_out,
 		// logic [NUM_STACKS-1:0][STAGE_1_MUX_2_NUM_INPUTS-1:0][STAGE_1_OUT_BIT_WIDTH-1:0] mux_2_in,
 		// logic [NUM_STACKS-1:0][STAGE_1_MUX_2_NUM_INPUTS-1:0] sel,
-		 // logic [NUM_STACKS-1:0][STAGE_1_OUT_BIT_WIDTH_NECESSARY-1:0] stage_2_in,
-		 logic [NUM_STACKS-1:0][$clog2(STAGE_1_NUM_INPUTS)-1:0] wrPtr_q,
-		 logic [NUM_STACKS-1:0][$clog2(STAGE_1_NUM_INPUTS)-1:0] wrPtr_d,
-		 logic [NUM_STACKS-1:0][STAGE_1_NUM_INPUTS-1:0][STAGE_1_OUT_BIT_WIDTH_NECESSARY-1:0] stage_2_out,
-		 logic [NUM_STACKS-1:0][STAGE_1_NUM_INPUTS-1:0][STAGE_1_OUT_BIT_WIDTH_NECESSARY-1:0] stage_3_in,
-		 logic [NUM_STACKS-1:0][STAGE_3_OUT_BIT_WIDTH-1:0] stage_3_out,
-		 logic [NUM_STACKS-1:0][STAGE_3_OUT_BIT_WIDTH-1:0] stage_3_out_acc,
-		 logic [NUM_STACKS-1:0][STAGE_3_OUT_BIT_WIDTH-1:0] stage_4_in,
-		 logic [NUM_STACKS-1:0][counter_bit_width-1:0] counter_q,
-		 logic [NUM_STACKS-1:0][counter_bit_width-1:0] counter_q1,
-		 logic [NUM_STACKS-1:0][counter_bit_width-1:0] counter_q2,
-		 logic [NUM_STACKS-1:0][counter_bit_width-1:0] counter_d,
-		 logic [NUM_STACKS-1:0][STAGE_4_OUT_BIT_WIDTH-1:0] stage_4_out_mul,
-		 logic [NUM_STACKS-1:0][STAGE_4_OUT_BIT_WIDTH-1:0] stage_4_out,
-		 logic [NUM_STACKS-1:0][STAGE_4_OUT_BIT_WIDTH-1:0][STAGE_4_OUT_BIT_WIDTH-1:0] mult_inter,
-		 logic [NUM_STACKS-1:0] weight_zero, 
-		 logic [STAGE_1_BIT_WIDTH+STAGE_1_NUM_INPUTS-1:0] mul_test
+		// logic [NUM_STACKS-1:0][STAGE_1_OUT_BIT_WIDTH_NECESSARY-1:0] stage_2_in,
+		//  logic [NUM_STACKS-1:0][$clog2(STAGE_1_NUM_INPUTS)-1:0] wrPtr_q,
+		//  logic [NUM_STACKS-1:0][$clog2(STAGE_1_NUM_INPUTS)-1:0] wrPtr_d,
+		//  logic [NUM_STACKS-1:0][STAGE_1_NUM_INPUTS-1:0][STAGE_1_OUT_BIT_WIDTH_NECESSARY-1:0] stage_2_out,
+		//  logic [NUM_STACKS-1:0][STAGE_1_NUM_INPUTS-1:0][STAGE_1_OUT_BIT_WIDTH_NECESSARY-1:0] stage_3_in,
+		//  logic [NUM_STACKS-1:0][STAGE_3_OUT_BIT_WIDTH-1:0] stage_3_out,
+		//  logic [NUM_STACKS-1:0][STAGE_3_OUT_BIT_WIDTH-1:0] stage_3_out_acc,
+		//  logic [NUM_STACKS-1:0][STAGE_3_OUT_BIT_WIDTH-1:0] stage_4_in,
+		//  logic [NUM_STACKS-1:0][counter_bit_width-1:0] counter_q,
+		//  logic [NUM_STACKS-1:0][counter_bit_width-1:0] counter_q1,
+		//  logic [NUM_STACKS-1:0][counter_bit_width-1:0] counter_q2,
+		//  logic [NUM_STACKS-1:0][counter_bit_width-1:0] counter_d,
+		//  logic [NUM_STACKS-1:0][STAGE_4_OUT_BIT_WIDTH-1:0] stage_4_out_mul,
+		//  logic [NUM_STACKS-1:0][STAGE_4_OUT_BIT_WIDTH-1:0] stage_4_out,
+		//  logic [NUM_STACKS-1:0][STAGE_4_OUT_BIT_WIDTH-1:0][STAGE_4_OUT_BIT_WIDTH-1:0] mult_inter,
+		//  logic [NUM_STACKS-1:0] weight_zero, 
+		//  logic [STAGE_1_BIT_WIDTH+STAGE_1_NUM_INPUTS-1:0] mul_test
 	//-- Ends here
 	// Add the address mapping for the harness signals below
 	assign slv_reg_rden = axi_arready & S_AXI_ARVALID & ~axi_rvalid;
@@ -1103,8 +1118,10 @@
 	        7'h3D   : reg_data_out <= slv_reg61;
 	        7'h3E   : reg_data_out <= slv_reg62;
 	        7'h3F   : reg_data_out <= slv_reg63;
-			7'h40   : reg_data_out <= slv_reg64;
+			    7'h40   : reg_data_out <= slv_reg64;
 	        7'h41   : reg_data_out <= slv_reg65;
+					
+
 	        default : reg_data_out <= 0;
 	      endcase
 	end
