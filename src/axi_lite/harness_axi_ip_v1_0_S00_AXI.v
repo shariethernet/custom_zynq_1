@@ -173,6 +173,7 @@
 	wire	 slv_reg_rden;
 	wire	 slv_reg_wren;
 	reg [C_S_AXI_DATA_WIDTH-1:0]	 reg_data_out;
+	reg [C_S_AXI_DATA_WIDTH-1:0]	 cim_data_out;
 	integer	 byte_index;
 	reg	 aw_en;
 
@@ -1067,133 +1068,134 @@
 	// Add the address mapping for the harness signals below
 	assign slv_reg_rden = axi_arready & S_AXI_ARVALID & ~axi_rvalid;
 //	wire [C_S_AXI_DATA_WIDTH-1:0] reg31, reg30, reg29, reg28, reg27, reg26, reg2, reg24, reg23, reg22, reg21, reg20, reg19, reg18, reg17, reg16, reg15, reg14, reg13, reg12, reg11, reg10, reg9, reg8, reg7, reg6, reg5, reg4, reg3, reg2, reg1, reg0;
+	
 	always @(*)
 	begin
-	genvar i, j;
-	integer start_index = 7'h42;
-	integer chunk_width = 1;
-	generate for (i=0; i<chunk_width; i+=1) begin
-		for (j=start_index; j<start_index+chunk_width; j+=1) begin
-			if (j==axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB])
-				reg_data_out <= stage_4_o[j-start_index];
+		genvar i, j;
+		integer start_index = 7'h42;
+		integer chunk_width = 1;
+		generate for (i=0; i<chunk_width; i+=1) begin
+			for (j=start_index; j<start_index+chunk_width; j+=1) begin
+				if (j==axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB])
+					cim_data_out <= stage_4_o[j-start_index];
+			end
 		end
-	end
-	endgenerate
-	start_index += chunk_width;
-	chunk_width = (((NUM_STACKS*STAGE_1_NUM_INPUTS*STAGE_1_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1;
-	generate for (i=0; i<chunk_width; i+=1) begin
-		for (j=start_index; j<start_index+chunk_width; j+=1) begin
-			if (j==axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB])
-				reg_data_out <= stage_1_in[j-start_index];
+		endgenerate
+		start_index += chunk_width;
+		chunk_width = (((NUM_STACKS*STAGE_1_NUM_INPUTS*STAGE_1_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1;
+		generate for (i=0; i<chunk_width; i+=1) begin
+			for (j=start_index; j<start_index+chunk_width; j+=1) begin
+				if (j==axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB])
+					cim_data_out <= stage_1_in[j-start_index];
+			end
 		end
-	end
-	endgenerate
-	start_index += chunk_width;
-	chunk_width = (((NUM_STACKS*STAGE_1_NUM_INPUTS*STAGE_1_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1;
-	generate for (i=0; i<chunk_width; i+=1) begin
-		for (j=start_index; j<start_index+chunk_width; j+=1) begin
-			if (j==axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB])
-				reg_data_out <= stage_1_flop_in[j-start_index];
+		endgenerate
+		start_index += chunk_width;
+		chunk_width = (((NUM_STACKS*STAGE_1_NUM_INPUTS*STAGE_1_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1;
+		generate for (i=0; i<chunk_width; i+=1) begin
+			for (j=start_index; j<start_index+chunk_width; j+=1) begin
+				if (j==axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB])
+					cim_data_out <= stage_1_flop_in[j-start_index];
+			end
 		end
-	end
-	endgenerate
-	start_index += chunk_width;
-	chunk_width = (((NUM_STACKS*SIZE_ACT_ARRAY*STAGE_1_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1;
-	generate for (i=0; i<chunk_width; i+=1) begin
-		for (j=start_index; j<start_index+chunk_width; j+=1) begin
-			if (j==axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB])
-				reg_data_out <= wrData_act_q[j-start_index];
+		endgenerate
+		start_index += chunk_width;
+		chunk_width = (((NUM_STACKS*SIZE_ACT_ARRAY*STAGE_1_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1;
+		generate for (i=0; i<chunk_width; i+=1) begin
+			for (j=start_index; j<start_index+chunk_width; j+=1) begin
+				if (j==axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB])
+					cim_data_out <= wrData_act_q[j-start_index];
+			end
 		end
-	end
-	endgenerate
-	start_index += chunk_width;
-	chunk_width = (((NUM_STACKS*STAGE_3_OUT_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1;
-	generate for (i=0; i<chunk_width; i+=1) begin
-		for (j=start_index; j<start_index+chunk_width; j+=1) begin
-			if (j==axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB])
-				reg_data_out <= stage_4_in[j-start_index];
+		endgenerate
+		start_index += chunk_width;
+		chunk_width = (((NUM_STACKS*STAGE_3_OUT_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1;
+		generate for (i=0; i<chunk_width; i+=1) begin
+			for (j=start_index; j<start_index+chunk_width; j+=1) begin
+				if (j==axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB])
+					cim_data_out <= stage_4_in[j-start_index];
+			end
 		end
-	end
-	endgenerate
-	start_index += chunk_width;
-	chunk_width = (((NUM_STACKS*STAGE_4_OUT_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1;
-	generate for (i=0; i<chunk_width; i+=1) begin
-		for (j=start_index; j<start_index+chunk_width; j+=1) begin
-			if (j==axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB])
-				reg_data_out <= stage_4_out[j-start_index];
+		endgenerate
+		start_index += chunk_width;
+		chunk_width = (((NUM_STACKS*STAGE_4_OUT_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1;
+		generate for (i=0; i<chunk_width; i+=1) begin
+			for (j=start_index; j<start_index+chunk_width; j+=1) begin
+				if (j==axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB])
+					cim_data_out <= stage_4_out[j-start_index];
+			end
 		end
-	end
-	endgenerate
-	// Address decoding for reading registers
-	case ( axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] )
-		7'h00   : reg_data_out <= slv_reg0;
-		7'h01   : reg_data_out <= slv_reg1;
-		7'h02   : reg_data_out <= slv_reg2;
-		7'h03   : reg_data_out <= slv_reg3;
-		7'h04   : reg_data_out <= slv_reg4;
-		7'h05   : reg_data_out <= slv_reg5;
-		7'h06   : reg_data_out <= slv_reg6;
-		7'h07   : reg_data_out <= slv_reg7;
-		7'h08   : reg_data_out <= slv_reg8;
-		7'h09   : reg_data_out <= slv_reg9;
-		7'h0A   : reg_data_out <= slv_reg10;
-		7'h0B   : reg_data_out <= slv_reg11;
-		7'h0C   : reg_data_out <= slv_reg12;
-		7'h0D   : reg_data_out <= slv_reg13;
-		7'h0E   : reg_data_out <= slv_reg14;
-		7'h0F   : reg_data_out <= slv_reg15;
-		7'h10   : reg_data_out <= slv_reg16;
-		7'h11   : reg_data_out <= slv_reg17;
-		7'h12   : reg_data_out <= slv_reg18;
-		7'h13   : reg_data_out <= slv_reg19;
-		7'h14   : reg_data_out <= slv_reg20;
-		7'h15   : reg_data_out <= slv_reg21;
-		7'h16   : reg_data_out <= slv_reg22;
-		7'h17   : reg_data_out <= slv_reg23;
-		7'h18   : reg_data_out <= slv_reg24;
-		7'h19   : reg_data_out <= slv_reg25;
-		7'h1A   : reg_data_out <= slv_reg26;
-		7'h1B   : reg_data_out <= slv_reg27;
-		7'h1C   : reg_data_out <= slv_reg28;
-		7'h1D   : reg_data_out <= slv_reg29;
-		7'h1E   : reg_data_out <= slv_reg30;
-		7'h1F   : reg_data_out <= slv_reg31;
-		7'h20   : reg_data_out <= slv_reg32;
-		7'h21   : reg_data_out <= slv_reg33;
-		7'h22   : reg_data_out <= slv_reg34;
-		7'h23   : reg_data_out <= slv_reg35;
-		7'h24   : reg_data_out <= slv_reg36;
-		7'h25   : reg_data_out <= slv_reg37;
-		7'h26   : reg_data_out <= slv_reg38;
-		7'h27   : reg_data_out <= slv_reg39;
-		7'h28   : reg_data_out <= slv_reg40;
-		7'h29   : reg_data_out <= slv_reg41;
-		7'h2A   : reg_data_out <= slv_reg42;
-		7'h2B   : reg_data_out <= slv_reg43;
-		7'h2C   : reg_data_out <= slv_reg44;
-		7'h2D   : reg_data_out <= slv_reg45;
-		7'h2E   : reg_data_out <= slv_reg46;
-		7'h2F   : reg_data_out <= slv_reg47;
-		7'h30   : reg_data_out <= slv_reg48;
-		7'h31   : reg_data_out <= slv_reg49;
-		7'h32   : reg_data_out <= slv_reg50;
-		7'h33   : reg_data_out <= slv_reg51;
-		7'h34   : reg_data_out <= slv_reg52;
-		7'h35   : reg_data_out <= slv_reg53;
-		7'h36   : reg_data_out <= slv_reg54;
-		7'h37   : reg_data_out <= slv_reg55;
-		7'h38   : reg_data_out <= slv_reg56;
-		7'h39   : reg_data_out <= slv_reg57;
-		7'h3A   : reg_data_out <= slv_reg58;
-		7'h3B   : reg_data_out <= slv_reg59;
-		7'h3C   : reg_data_out <= slv_reg60;
-		7'h3D   : reg_data_out <= slv_reg61;
-		7'h3E   : reg_data_out <= slv_reg62;
-		7'h3F   : reg_data_out <= slv_reg63;
-		7'h40   : reg_data_out <= slv_reg64;
-		7'h41   : reg_data_out <= slv_reg65;
-		default : reg_data_out <= 0;
-	endcase
+		endgenerate
+		// Address decoding for reading registers
+		case ( axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] )
+			7'h00   : reg_data_out <= slv_reg0;
+			7'h01   : reg_data_out <= slv_reg1;
+			7'h02   : reg_data_out <= slv_reg2;
+			7'h03   : reg_data_out <= slv_reg3;
+			7'h04   : reg_data_out <= slv_reg4;
+			7'h05   : reg_data_out <= slv_reg5;
+			7'h06   : reg_data_out <= slv_reg6;
+			7'h07   : reg_data_out <= slv_reg7;
+			7'h08   : reg_data_out <= slv_reg8;
+			7'h09   : reg_data_out <= slv_reg9;
+			7'h0A   : reg_data_out <= slv_reg10;
+			7'h0B   : reg_data_out <= slv_reg11;
+			7'h0C   : reg_data_out <= slv_reg12;
+			7'h0D   : reg_data_out <= slv_reg13;
+			7'h0E   : reg_data_out <= slv_reg14;
+			7'h0F   : reg_data_out <= slv_reg15;
+			7'h10   : reg_data_out <= slv_reg16;
+			7'h11   : reg_data_out <= slv_reg17;
+			7'h12   : reg_data_out <= slv_reg18;
+			7'h13   : reg_data_out <= slv_reg19;
+			7'h14   : reg_data_out <= slv_reg20;
+			7'h15   : reg_data_out <= slv_reg21;
+			7'h16   : reg_data_out <= slv_reg22;
+			7'h17   : reg_data_out <= slv_reg23;
+			7'h18   : reg_data_out <= slv_reg24;
+			7'h19   : reg_data_out <= slv_reg25;
+			7'h1A   : reg_data_out <= slv_reg26;
+			7'h1B   : reg_data_out <= slv_reg27;
+			7'h1C   : reg_data_out <= slv_reg28;
+			7'h1D   : reg_data_out <= slv_reg29;
+			7'h1E   : reg_data_out <= slv_reg30;
+			7'h1F   : reg_data_out <= slv_reg31;
+			7'h20   : reg_data_out <= slv_reg32;
+			7'h21   : reg_data_out <= slv_reg33;
+			7'h22   : reg_data_out <= slv_reg34;
+			7'h23   : reg_data_out <= slv_reg35;
+			7'h24   : reg_data_out <= slv_reg36;
+			7'h25   : reg_data_out <= slv_reg37;
+			7'h26   : reg_data_out <= slv_reg38;
+			7'h27   : reg_data_out <= slv_reg39;
+			7'h28   : reg_data_out <= slv_reg40;
+			7'h29   : reg_data_out <= slv_reg41;
+			7'h2A   : reg_data_out <= slv_reg42;
+			7'h2B   : reg_data_out <= slv_reg43;
+			7'h2C   : reg_data_out <= slv_reg44;
+			7'h2D   : reg_data_out <= slv_reg45;
+			7'h2E   : reg_data_out <= slv_reg46;
+			7'h2F   : reg_data_out <= slv_reg47;
+			7'h30   : reg_data_out <= slv_reg48;
+			7'h31   : reg_data_out <= slv_reg49;
+			7'h32   : reg_data_out <= slv_reg50;
+			7'h33   : reg_data_out <= slv_reg51;
+			7'h34   : reg_data_out <= slv_reg52;
+			7'h35   : reg_data_out <= slv_reg53;
+			7'h36   : reg_data_out <= slv_reg54;
+			7'h37   : reg_data_out <= slv_reg55;
+			7'h38   : reg_data_out <= slv_reg56;
+			7'h39   : reg_data_out <= slv_reg57;
+			7'h3A   : reg_data_out <= slv_reg58;
+			7'h3B   : reg_data_out <= slv_reg59;
+			7'h3C   : reg_data_out <= slv_reg60;
+			7'h3D   : reg_data_out <= slv_reg61;
+			7'h3E   : reg_data_out <= slv_reg62;
+			7'h3F   : reg_data_out <= slv_reg63;
+			7'h40   : reg_data_out <= slv_reg64;
+			7'h41   : reg_data_out <= slv_reg65;
+			default : reg_data_out <= cim_data_out;
+		endcase
 	end
 
 	// Output register or memory read data
