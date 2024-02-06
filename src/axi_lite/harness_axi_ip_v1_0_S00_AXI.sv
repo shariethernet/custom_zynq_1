@@ -1002,15 +1002,15 @@
 	parameter integer STAGE_1_MAX_SHIFT_AMT = STAGE_1_NUM_INPUTS-1;
 	parameter integer STAGE_1_MUX_2_NUM_INPUTS = STAGE_1_NUM_INPUTS+1;
 	parameter integer STAGE_1_OUT_BIT_WIDTH = STAGE_1_BIT_WIDTH+STAGE_1_MAX_SHIFT_AMT+$clog2(STAGE_1_NUM_INPUTS);
-	parameter integer STAGE_1_OUT_BIT_WIDTH_NECESSARY = STAGE_1_NUM_INPUTS + STAGE_1_BIT_WIDTH-1; //For signed representation
-	parameter integer STAGE_3_OUT_BIT_WIDTH = STAGE_1_OUT_BIT_WIDTH_NECESSARY+ $clog2(STAGE_1_NUM_INPUTS);
+	parameter integer STAGE_1_OUT_BIT_WIDTH_NECESSARY = STAGE_1_NUM_INPUTS + STAGE_1_BIT_WIDTH-1; //15
+	parameter integer STAGE_3_OUT_BIT_WIDTH = STAGE_1_OUT_BIT_WIDTH_NECESSARY+ $clog2(STAGE_1_NUM_INPUTS); //15+3 = 18
    	parameter integer counter_bit_width = $clog2(SRAM_THROUGHPUT)+$clog2(STAGE_1_NUM_INPUTS);
-   	parameter integer STAGE_4_OUT_BIT_WIDTH = STAGE_3_OUT_BIT_WIDTH+STAGE_4_BIT_WIDTH;
+   	parameter integer STAGE_4_OUT_BIT_WIDTH = STAGE_3_OUT_BIT_WIDTH+STAGE_4_BIT_WIDTH; //18+4 = 22
 
 	wire [C_S_AXI_DATA_WIDTH-1:0] stage_4_o;
-	wire [C_S_AXI_DATA_WIDTH-1:0] stage_1_in[(((NUM_STACKS*STAGE_1_NUM_INPUTS*STAGE_1_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1:0];
-	wire [C_S_AXI_DATA_WIDTH-1:0] stage_1_flop_in[(((NUM_STACKS*STAGE_1_NUM_INPUTS*STAGE_1_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1:0];
-	wire [C_S_AXI_DATA_WIDTH-1:0] wrData_act_q[(((NUM_STACKS*SIZE_ACT_ARRAY*STAGE_1_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1:0];
+	wire [C_S_AXI_DATA_WIDTH-1:0] stage_1_in[(((NUM_STACKS*STAGE_1_NUM_INPUTS*STAGE_1_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1:0]; // 1
+	wire [C_S_AXI_DATA_WIDTH-1:0] stage_1_flop_in[(((NUM_STACKS*STAGE_1_NUM_INPUTS*STAGE_1_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1:0]; // 2
+	wire [C_S_AXI_DATA_WIDTH-1:0] wrData_act_q[(((NUM_STACKS*SIZE_ACT_ARRAY*STAGE_1_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1:0]; // 3
 	wire [C_S_AXI_DATA_WIDTH-1:0] shift_out[((NUM_STACKS*STAGE_1_NUM_INPUTS*(STAGE_1_BIT_WIDTH+STAGE_1_MAX_SHIFT_AMT)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1:0];
 	wire [C_S_AXI_DATA_WIDTH-1:0] adder_out[(((NUM_STACKS*STAGE_1_OUT_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1:0];
 	wire [C_S_AXI_DATA_WIDTH-1:0] stage_1_out[(((NUM_STACKS*STAGE_1_OUT_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1:0];
@@ -1023,16 +1023,17 @@
 	wire [C_S_AXI_DATA_WIDTH-1:0] stage_3_in[(((NUM_STACKS*STAGE_1_NUM_INPUTS*STAGE_1_OUT_BIT_WIDTH_NECESSARY)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1:0];
 	wire [C_S_AXI_DATA_WIDTH-1:0] stage_3_out [(((NUM_STACKS*STAGE_3_OUT_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1:0];
 	wire [C_S_AXI_DATA_WIDTH-1:0] stage_3_out_acc [(((NUM_STACKS*STAGE_3_OUT_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1:0]; 
-	wire [C_S_AXI_DATA_WIDTH-1:0] stage_4_in [(((NUM_STACKS*STAGE_3_OUT_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1:0]; 
+	wire [C_S_AXI_DATA_WIDTH-1:0] stage_4_in [(((NUM_STACKS*STAGE_3_OUT_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1:0]; //4
 	wire [C_S_AXI_DATA_WIDTH-1:0] counter_q [(((NUM_STACKS*counter_bit_width)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1:0];
 	wire [C_S_AXI_DATA_WIDTH-1:0] counter_q1 [(((NUM_STACKS*counter_bit_width)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1:0];
 	wire [C_S_AXI_DATA_WIDTH-1:0] counter_q2 [(((NUM_STACKS*counter_bit_width)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1:0];
 	wire [C_S_AXI_DATA_WIDTH-1:0] counter_d [(((NUM_STACKS*counter_bit_width)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1:0];
 	wire [C_S_AXI_DATA_WIDTH-1:0] stage_4_out_mul [(((NUM_STACKS*STAGE_4_OUT_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1:0];
-	wire [C_S_AXI_DATA_WIDTH-1:0] stage_4_out [(((NUM_STACKS*STAGE_4_OUT_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1:0];
-	wire [C_S_AXI_DATA_WIDTH-1:0] mult_inter [(((NUM_STACKS*STAGE_4_OUT_BIT_WIDTH*STAGE_4_OUT_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1:0];
+	wire [C_S_AXI_DATA_WIDTH-1:0] stage_4_out [(((NUM_STACKS*STAGE_4_OUT_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1:0]; //5
+	wire [C_S_AXI_DATA_WIDTH-1:0] mult_inter [(((NUM_STACKS*STAGE_4_OUT_BIT_WIDTH*STAGE_4_OUT_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1:0]; 
 	wire [C_S_AXI_DATA_WIDTH-1:0] weight_zero [(((NUM_STACKS)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1:0];
-	wire [C_S_AXI_DATA_WIDTH-1:0] mul_test [(((STAGE_1_BIT_WIDTH*STAGE_1_NUM_INPUTS)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1:0];
+	wire [C_S_AXI_DATA_WIDTH-1:0] mul_test ;
+	wire [C_S_AXI_DATA_WIDTH-1:0] done;
 
 	//-- End here
 	/*
@@ -1069,63 +1070,84 @@
 	assign slv_reg_rden = axi_arready & S_AXI_ARVALID & ~axi_rvalid;
 //	wire [C_S_AXI_DATA_WIDTH-1:0] reg31, reg30, reg29, reg28, reg27, reg26, reg2, reg24, reg23, reg22, reg21, reg20, reg19, reg18, reg17, reg16, reg15, reg14, reg13, reg12, reg11, reg10, reg9, reg8, reg7, reg6, reg5, reg4, reg3, reg2, reg1, reg0;
 	
-	always @(*)
-	begin
-		genvar i, j;
-		integer start_index = 7'h42;
-		integer chunk_width = 1;
-		generate for (i=0; i<chunk_width; i+=1) begin
-			for (j=start_index; j<start_index+chunk_width; j+=1) begin
-				if (j==axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB])
-					cim_data_out <= stage_4_o[j-start_index];
-			end
-		end
-		endgenerate
-		start_index += chunk_width;
-		chunk_width = (((NUM_STACKS*STAGE_1_NUM_INPUTS*STAGE_1_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1;
-		generate for (i=0; i<chunk_width; i+=1) begin
-			for (j=start_index; j<start_index+chunk_width; j+=1) begin
-				if (j==axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB])
-					cim_data_out <= stage_1_in[j-start_index];
-			end
-		end
-		endgenerate
-		start_index += chunk_width;
-		chunk_width = (((NUM_STACKS*STAGE_1_NUM_INPUTS*STAGE_1_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1;
-		generate for (i=0; i<chunk_width; i+=1) begin
-			for (j=start_index; j<start_index+chunk_width; j+=1) begin
-				if (j==axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB])
-					cim_data_out <= stage_1_flop_in[j-start_index];
-			end
-		end
-		endgenerate
-		start_index += chunk_width;
-		chunk_width = (((NUM_STACKS*SIZE_ACT_ARRAY*STAGE_1_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1;
-		generate for (i=0; i<chunk_width; i+=1) begin
-			for (j=start_index; j<start_index+chunk_width; j+=1) begin
-				if (j==axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB])
-					cim_data_out <= wrData_act_q[j-start_index];
-			end
-		end
-		endgenerate
-		start_index += chunk_width;
-		chunk_width = (((NUM_STACKS*STAGE_3_OUT_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1;
-		generate for (i=0; i<chunk_width; i+=1) begin
-			for (j=start_index; j<start_index+chunk_width; j+=1) begin
-				if (j==axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB])
-					cim_data_out <= stage_4_in[j-start_index];
-			end
-		end
-		endgenerate
-		start_index += chunk_width;
-		chunk_width = (((NUM_STACKS*STAGE_4_OUT_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH))-1;
-		generate for (i=0; i<chunk_width; i+=1) begin
-			for (j=start_index; j<start_index+chunk_width; j+=1) begin
-				if (j==axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB])
-					cim_data_out <= stage_4_out[j-start_index];
-			end
-		end
-		endgenerate
+
+
+		
+		
+
+		//genvar i;
+		// parameter integer start_index_1 = 7'h42;
+		// parameter integer chunk_width_1 = 1;
+		// generate 
+		// 	for(i=start_index_1;i<start_index_1+chunk_width_1;i+=1) begin
+		// 	always @(*)
+		// 	begin
+		// 		if(axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB]==i)	reg_data_out <= stage_4_o;
+		// 	end
+		// end
+		// endgenerate
+		
+		// 7'h43 = d67
+		// parameter integer start_index_2 = start_index_1 + chunk_width_1;
+		// // ceil(8*8*8/32) = 16
+		// parameter integer chunk_width_2 = (((NUM_STACKS*STAGE_1_NUM_INPUTS*STAGE_1_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH)); 
+		// generate
+		// 	for(i=start_index_2;i<start_index_2+chunk_width_2;i+=1) begin
+		// 	 always@(*) begin 
+		// 		if(axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB]==i) reg_data_out <= stage_1_in[i-start_index_2];
+		// 	 end
+		// 	end
+		// endgenerate
+
+		// start = d83
+		// parameter integer start_index_3 = start_index_2 + chunk_width_2;
+		// // 16
+		// parameter integer chunk_width_3 = (((NUM_STACKS*STAGE_1_NUM_INPUTS*STAGE_1_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH));
+		// generate 
+		// 	for(i=start_index_3;i<start_index_3+chunk_width_3;i+=1) begin
+		// 	 always@(*) begin 
+		// 		if(axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB]==i) reg_data_out <= stage_1_flop_in[i-start_index_3];
+		// 	 end
+		// 	end 
+		// endgenerate
+
+		// // start = d99
+		// parameter integer start_index_4 = start_index_3 + chunk_width_3;
+		// // 8*8/32 = 2
+		// parameter integer chunk_width_4 = (((NUM_STACKS*SIZE_ACT_ARRAY*STAGE_1_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH));
+		// generate 
+		// 	for(i=start_index_4;i<start_index_4+chunk_width_4;i+=1) begin
+		// 	 always@(*) begin 
+		// 		if(axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB]==i) reg_data_out <= wrData_act_q[i-start_index_4];
+		// 	 end
+		// 	end
+		// endgenerate
+
+		// // start = d101
+		// parameter integer start_index_5 = start_index_4 + chunk_width_4;
+		// // ceil(8*18/32) = 5
+		// parameter integer chunk_width_5 = (((NUM_STACKS*STAGE_3_OUT_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH));
+		// generate
+		// 	for(i=start_index_5;i<start_index_5+chunk_width_5;i+=1) begin
+		// 	 always@(*) begin 
+		// 		if(axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB]==i) reg_data_out <= stage_4_in[i-start_index_5];
+		// 	 end
+		// 	end
+		// endgenerate
+
+		// // start = d106
+		// parameter integer start_index_6 = start_index_5 + chunk_width_5;
+		// parameter integer chunk_width_6 = (((NUM_STACKS*STAGE_4_OUT_BIT_WIDTH)+(C_S_AXI_DATA_WIDTH-1))/(C_S_AXI_DATA_WIDTH));
+		// //ceil(8*22/32) = 6
+		// generate
+		// 	for(i=start_index_6;i<start_index_6+chunk_width_6;i+=1) begin
+		// 	 always@(*) begin 
+		// 		if(axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB]==i) reg_data_out <= stage_4_out[i-start_index_6];
+		// 	 end
+		// 	end
+		// endgenerate
+		// // 106+6 = 112
+		always@(*) begin
 		// Address decoding for reading registers
 		case ( axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] )
 			7'h00   : reg_data_out <= slv_reg0;
@@ -1194,7 +1216,60 @@
 			7'h3F   : reg_data_out <= slv_reg63;
 			7'h40   : reg_data_out <= slv_reg64;
 			7'h41   : reg_data_out <= slv_reg65;
-			default : reg_data_out <= cim_data_out;
+			7'h42   : reg_data_out <= stage_4_o;
+			//16 - stage_1_in
+			7'h43   : reg_data_out <= stage_1_in[0];
+			7'h44   : reg_data_out <= stage_1_in[1];
+			7'h45   : reg_data_out <= stage_1_in[2];
+			7'h46   : reg_data_out <= stage_1_in[3];
+			7'h47   : reg_data_out <= stage_1_in[4];
+			7'h48   : reg_data_out <= stage_1_in[5];
+			7'h49   : reg_data_out <= stage_1_in[6];
+			7'h4A   : reg_data_out <= stage_1_in[7];
+			7'h4B   : reg_data_out <= stage_1_in[8];
+			7'h4C   : reg_data_out <= stage_1_in[9];
+			7'h4D   : reg_data_out <= stage_1_in[10];
+			7'h4E   : reg_data_out <= stage_1_in[11];
+			7'h4F   : reg_data_out <= stage_1_in[12];
+			7'h50   : reg_data_out <= stage_1_in[13];
+			7'h51   : reg_data_out <= stage_1_in[14];
+			7'h52   : reg_data_out <= stage_1_in[15];
+			//16 - stage_1_flop_in
+			7'h53   : reg_data_out <= stage_1_flop_in[0];
+			7'h54   : reg_data_out <= stage_1_flop_in[1];
+			7'h55   : reg_data_out <= stage_1_flop_in[2];
+			7'h56   : reg_data_out <= stage_1_flop_in[3];
+			7'h57   : reg_data_out <= stage_1_flop_in[4];
+			7'h58   : reg_data_out <= stage_1_flop_in[5];
+			7'h59   : reg_data_out <= stage_1_flop_in[6];
+			7'h5A   : reg_data_out <= stage_1_flop_in[7];
+			7'h5B   : reg_data_out <= stage_1_flop_in[8];
+			7'h5C   : reg_data_out <= stage_1_flop_in[9];
+			7'h5D   : reg_data_out <= stage_1_flop_in[10];
+			7'h5E   : reg_data_out <= stage_1_flop_in[11];
+			7'h5F   : reg_data_out <= stage_1_flop_in[12];
+			7'h60   : reg_data_out <= stage_1_flop_in[13];
+			7'h61   : reg_data_out <= stage_1_flop_in[14];
+			7'h62   : reg_data_out <= stage_1_flop_in[15];
+			//2 - wrData_act_q
+			7'h63   : reg_data_out <= wrData_act_q[0];
+			7'h64   : reg_data_out <= wrData_act_q[1];
+			//5 - stage_4_in
+			7'h65   : reg_data_out <= stage_4_in[0];
+			7'h66   : reg_data_out <= stage_4_in[1];
+			7'h67   : reg_data_out <= stage_4_in[2];
+			7'h68   : reg_data_out <= stage_4_in[3];
+			7'h69   : reg_data_out <= stage_4_in[4];
+			//6 - stage_4_out
+			7'h6A   : reg_data_out <= stage_4_out[0];
+			7'h6B   : reg_data_out <= stage_4_out[1];
+			7'h6C   : reg_data_out <= stage_4_out[2];
+			7'h6D   : reg_data_out <= stage_4_out[3];
+			7'h6E   : reg_data_out <= stage_4_out[4];
+			7'h6F   : reg_data_out <= stage_4_out[5];
+			7'h70 :reg_data_out <= mul_test;
+			7'h71 :reg_data_out <= done;
+			default : reg_data_out <= 0;
 		endcase
 	end
 
@@ -1221,53 +1296,54 @@
 	harness_axi harness_axi_inst(
 		.clk(S_AXI_ACLK),
 		//-- Input
-		.wrEn_queue(wrEn_queue),
-		.wrData_queue(wrData_queue),
-		.DISABLE_STAGE_1(DISABLE_STAGE_1),
-		.DISABLE_STAGE_4(DISABLE_STAGE_4),
-		.wrEn_act_array(wrEn_act_array),
-		.wrData_act(wrData_act),
-		.input_wt(input_wt),
-		.SRAM_flop_en_in(SRAM_flop_en_in),//Chicken bit
-		.flop_1_en_in(flop_1_en_in),//Chicken bit
-		.flop_3_en_in(flop_3_en_in),//Chicken bit
-		.queue_en_in(queue_en_in),//Chicken bit for stage 2
-		.wrPtr_d_in(wrPtr_d_in), //Chicken bit
-		.in(in),//Chicken bit for safety reasons
-		.wrPtr_over_in(wrPtr_over_in), //Chicken bit
-		.DISABLE_STAGE_2(DISABLE_STAGE_2),//Chicken bit
-		.DISABLE_STAGE_3(DISABLE_STAGE_3),//Chicken bit
-		.chicken_bit(chicken_bit),
+		.wrEn_queue(slv_reg0),
+		.wrData_queue(slv_reg1),
+		.DISABLE_STAGE_1(slv_reg2),
+		.DISABLE_STAGE_4(slv_reg3),
+		.wrEn_act_array(slv_reg4),
+		.wrData_act({slv_reg6,slv_reg7}), //64 bits
+		.input_wt({slv_reg9,slv_reg8}),   //64 bits
+		.SRAM_flop_en_in(slv_reg10),//Chicken bit
+		.flop_1_en_in(slv_reg11),//Chicken bit
+		.flop_3_en_in(slv_reg12),//Chicken bit
+		.queue_en_in(slv_reg13),//Chicken bit for stage 2
+		.wrPtr_d_in(slv_reg14), //Chicken bit --- 4 bits
+		.in(slv_reg15),//Chicken bit for safety reasons
+		.wrPtr_over_in(slv_reg16), //Chicken bit
+		.DISABLE_STAGE_2(slv_reg17),//Chicken bit
+		.DISABLE_STAGE_3(slv_reg18),//Chicken bit
+		.chicken_bit(slv_reg19), //Chicken bit
 
 		//-- Output
 		.stage_4_o(stage_4_o), //Chicken bit
-		.stage_1_in(stage_1_in),
-		.stage_1_flop_in(stage_1_flop_in),
-		.wrData_act_q(wrData_act_q),
-		.shift_out(shift_out),
-		.adder_out(adder_out),
-		.stage_1_out(stage_1_out),
-		.mux_2_in(mux_2_in),
-		.sel(sel),
-		.stage_2_in(stage_2_in),
-		.wrPtr_q(wrPtr_q),
-		.wrPtr_d(wrPtr_d),
-		.stage_2_out(stage_2_out),
-		.stage_3_in(stage_3_in),
-		.stage_3_out(stage_3_out),
-		.stage_3_out_acc(stage_3_out_acc),
-		.stage_4_in(stage_4_in),
-		.counter_q(counter_q),
-		.counter_q1(counter_q1),
-		.counter_q2(counter_q2),
-		.counter_d(counter_d),
-		.stage_4_out_mul(stage_4_out_mul),
-		.stage_4_out(stage_4_out),
-		.mult_inter(mult_inter),
-		.weight_zero(weight_zero), 
+		.stage_1_in({stage_1_in[15],stage_1_in[14],stage_1_in[13],stage_1_in[12],stage_1_in[11],stage_1_in[10],stage_1_in[9],stage_1_in[8],stage_1_in[7],stage_1_in[6],stage_1_in[5],stage_1_in[4],stage_1_in[3],stage_1_in[2],stage_1_in[1],stage_1_in[0]}),
+		.stage_1_flop_in({stage_1_flop_in[15],stage_1_flop_in[14],stage_1_flop_in[13],stage_1_flop_in[12],stage_1_flop_in[11],stage_1_flop_in[10],stage_1_flop_in[9],stage_1_flop_in[8],stage_1_flop_in[7],stage_1_flop_in[6],stage_1_flop_in[5],stage_1_flop_in[4],stage_1_flop_in[3],stage_1_flop_in[2],stage_1_flop_in[1],stage_1_flop_in[0]}),
+		.wrData_act_q({wrData_act_q[1],wrData_act_q[0]}), //64 bits
+		.shift_out(),
+		.adder_out(),
+		.stage_1_out(),
+		.mux_2_in(),
+		.sel(),
+		.stage_2_in(),
+		.wrPtr_q(),
+		.wrPtr_d(),
+		.stage_2_out(),
+		.stage_3_in(),
+		.stage_3_out(),
+		.stage_3_out_acc(),
+		.stage_4_in({stage_4_in[4],stage_4_in[3],stage_4_in[2],stage_4_in[1],stage_4_in[0]}), //5
+		.counter_q(),
+		.counter_q1(),
+		.counter_q2(),
+		.counter_d(),
+		.stage_4_out_mul(),
+		.stage_4_out({stage_4_out[5],stage_4_out[4],stage_4_out[3],stage_4_out[2],stage_4_out[1],stage_4_out[0]}), //6
+		.mult_inter(),
+		.weight_zero(), 
 		.mul_test(mul_test),
 		//-- End edits
-		.reset(slv_reg64)
+		.reset(slv_reg64),
+		.done(done)
 	);
 
 	// User logic ends

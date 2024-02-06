@@ -1,2 +1,11 @@
-cpu.v
-dmem.v
+CIM_CHIP_no_pad_no_scan_parameterized.sv
+CIM_CHIP_no_pad_no_scan.sv
+flip_flop.sv
+multiplexer.sv
+multiplier.sv
+queue.sv
+shifter.sv
+stage_1.sv
+stage_3.sv
+adder.sv
+multiplier_test.sv

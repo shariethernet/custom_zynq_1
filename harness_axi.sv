@@ -61,7 +61,9 @@ module harness_axi#(parameter NUM_STACKS = 8,
     output logic [NUM_STACKS-1:0][STAGE_4_OUT_BIT_WIDTH-1:0] stage_4_out,
     output logic [NUM_STACKS-1:0][STAGE_4_OUT_BIT_WIDTH-1:0][STAGE_4_OUT_BIT_WIDTH-1:0] mult_inter,
     output logic [NUM_STACKS-1:0] weight_zero, 
-    output logic [STAGE_1_BIT_WIDTH+STAGE_1_NUM_INPUTS-1:0] mul_test );
+    output logic [STAGE_1_BIT_WIDTH+STAGE_1_NUM_INPUTS-1:0] mul_test, 
+    output logic [NUM_STACKS-1:0] done
+    );
  
 CIM_CHIP_no_pad_no_scan_parametrized #(.NUM_STACKS(NUM_STACKS),
                       .STAGE_1_NUM_INPUTS(STAGE_1_NUM_INPUTS),//should be power of 2
@@ -121,5 +123,8 @@ CIM_CHIP_no_pad_no_scan_parametrized #(.NUM_STACKS(NUM_STACKS),
                         .mult_inter(mult_inter), 
                         .chicken_bit(chicken_bit), 
                         .weight_zero(weight_zero), 
-                        .mul_test(mul_test));
+                        .mul_test(mul_test),
+                        .done(done)
+                        
+                        );
 endmodule
